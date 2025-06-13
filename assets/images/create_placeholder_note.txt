@@ -1,0 +1,13 @@
+PLACEHOLDER IMAGES REQUIRED
+
+For the website to display correctly, you'll need to add the following images to this directory:
+- nukeintel1.png
+- nukeintel2.png
+- nukeintel3.png
+- nukeintel4.png
+- nukeintel5.png
+- nukeintel6.png
+
+These should be high-quality, dramatic images related to nuclear monitoring, alerts, or intelligence operations with a serious tone that matches the website's purpose.
+
+The images should ideally be the same size (recommended: 800x450px) for consistent display in the gallery grid.
