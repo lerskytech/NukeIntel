@@ -5,10 +5,10 @@ A modern, bold, and persuasive static website for NukeIntel.com, optimized for G
 ## Features
 
 - Dark, bold color scheme with red/orange/yellow highlights for urgency
-- Mobile responsive design
-- Interactive contact form (client-side only)
-- Image gallery with attention-grabbing overlays
-- Persuasive marketing content
+- Mobile responsive design with proper image scaling
+- Interactive contact form with enhanced thank-you message
+- Image gallery with attention-grabbing overlays for all nine images
+- Persuasive marketing content with centered elements
 - Ready for GitHub Pages deployment
 
 ## Setup Instructions
@@ -20,15 +20,18 @@ A modern, bold, and persuasive static website for NukeIntel.com, optimized for G
 
 ### Adding Images
 
-The website requires the following images (which need to be added to the repository):
-- `assets/images/nukeintel1.png`
-- `assets/images/nukeintel2.png`
-- `assets/images/nukeintel3.png`
-- `assets/images/nukeintel4.png`
-- `assets/images/nukeintel5.png`
-- `assets/images/nukeintel6.png`
+The website requires the following images:
+- `assets/images/nukeintel1.png` - "NUCLEAR THREAT LEVEL: HIGH"
+- `assets/images/nukeintel2.png` - "BREAKING: GLOBAL ALERT"
+- `assets/images/nukeintel3.png` - "INSTANT INTEL DROP"
+- `assets/images/nukeintel4.png` - "U.S. Missile Warning"
+- `assets/images/nukeintel5.png` - "Major Detonation Report"
+- `assets/images/nukeintel6.png` - "Shelter Guidance Update"
+- `assets/images/nukeintel7.png` - "Radiation Surge Alert"
+- `assets/images/nukeintel8.png` - "Civil Defense Bulletin"
+- `assets/images/nukeintel9.png` - "Red Zone Expansion"
 
-Replace these with appropriate nuclear intelligence-related imagery.
+For best results, use images of the same aspect ratio (16:9 recommended) and similar dramatic themes related to nuclear intelligence.
 
 ### GitHub Pages Deployment
 
