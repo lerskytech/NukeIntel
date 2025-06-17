@@ -15,11 +15,24 @@ const DoomsdayClock = () => {
   // Fetch clock data from API or use fallback
   const { data: clockData, isLoading, isError } = useClockData()
   
-  // Extract data from clock data
-  const secondsToMidnight = clockData?.minutesToMidnight || 90 // In seconds
-  const minutesToMidnight = secondsToMidnight / 60 // Convert to minutes (e.g. 90s = 1.5m)
-  const lastUpdated = clockData?.lastUpdated || '2024-01-24T12:00:00Z'
-  const statement = clockData?.statement || 'The Doomsday Clock stands at 90 seconds to midnight.'
+  // Extract Doomsday Clock data from API response
+  const { 
+    minutesToMidnight = 1.5, 
+    secondsToMidnight = 90, // Direct from API or calculated from minutes
+    lastUpdated, 
+    statement,
+    fetchedLive
+  } = clockData || {};
+  
+  // For logging only - to verify data
+  useEffect(() => {
+    console.log('Clock data loaded:', { 
+      minutesToMidnight, 
+      secondsToMidnight,
+      fetchedLive: fetchedLive || false,
+      lastUpdated 
+    });
+  }, [minutesToMidnight, secondsToMidnight, lastUpdated, fetchedLive]);
   
   // Derived state for display
   // We show the exact seconds (not rounded) for more precision

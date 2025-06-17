@@ -62,50 +62,90 @@ const SEARCH_KEYWORDS = [
 
 /**
  * Hook to fetch relevant news articles
- * Uses NewsAPI, GNews, or fallback data
+ * Uses NewsAPI with fallback to GNews or static data
  */
 export const useNews = (category = null) => {
   const fetchNews = async () => {
     try {
       // Try to get the API key from environment variables
-      const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
+      const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY;
+      const GNEWS_API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
       
-      // If no API key is available, fall back to static data
-      if (!API_KEY) {
-        console.warn('No NewsAPI key found. Using fallback news data.');
-        return FALLBACK_NEWS;
+      // If NewsAPI key is available, try that first
+      if (NEWS_API_KEY) {
+        try {
+          // Format keywords for API query
+          const keywords = encodeURIComponent(SEARCH_KEYWORDS.join(' OR '));
+          
+          // Use NewsAPI to fetch real articles
+          const url = `https://newsapi.org/v2/everything?q=${keywords}&sortBy=publishedAt&language=en&pageSize=25&apiKey=${NEWS_API_KEY}`;
+          
+          console.log('Fetching news from NewsAPI...');
+          const { data } = await axios.get(url);
+          
+          // If we got articles, format and return them
+          if (data.articles && data.articles.length > 0) {
+            console.log(`Successfully fetched ${data.articles.length} articles from NewsAPI`);
+            
+            return data.articles.map(article => ({
+              id: article.url,
+              title: article.title,
+              description: article.description,
+              source: article.source.name,
+              url: article.url,
+              publishedAt: article.publishedAt,
+              imageUrl: article.urlToImage,
+              isBreaking: article.title.toLowerCase().includes('breaking') || 
+                        (new Date(article.publishedAt) > new Date(Date.now() - 7200000)), // 2 hours
+              category: determineCategory(article.title + ' ' + (article.description || ''))
+            }));
+          }
+        } catch (newsApiError) {
+          console.error('Error fetching from NewsAPI:', newsApiError);
+        }
       }
       
-      // Format keywords for API query
-      const keywords = SEARCH_KEYWORDS.join(' OR ');
-      
-      // Use NewsAPI to fetch real articles
-      const url = `https://newsapi.org/v2/everything?q=${keywords}&sortBy=publishedAt&language=en&pageSize=20&apiKey=${API_KEY}`;
-      
-      const { data } = await axios.get(url);
-      
-      // If no articles were returned, use fallback data
-      if (!data.articles || data.articles.length === 0) {
-        console.warn('No news articles found from API. Using fallback news data.');
-        return FALLBACK_NEWS;
+      // Try GNews as a backup option
+      if (GNEWS_API_KEY) {
+        try {
+          // Try with GNews API as an alternative
+          const keywords = encodeURIComponent(SEARCH_KEYWORDS.slice(0, 5).join(' OR ')); // GNews has query length limits
+          
+          const gnewsUrl = `https://gnews.io/api/v4/search?q=${keywords}&lang=en&max=10&apikey=${GNEWS_API_KEY}`;
+          
+          console.log('Falling back to GNews API...');
+          const { data } = await axios.get(gnewsUrl);
+          
+          if (data.articles && data.articles.length > 0) {
+            console.log(`Successfully fetched ${data.articles.length} articles from GNews`);
+            
+            return data.articles.map(article => ({
+              id: article.url,
+              title: article.title,
+              description: article.description,
+              source: article.source.name,
+              url: article.url,
+              publishedAt: article.publishDate,
+              imageUrl: article.image,
+              isBreaking: article.title.toLowerCase().includes('breaking') || 
+                        (new Date(article.publishDate) > new Date(Date.now() - 7200000)), // 2 hours
+              category: determineCategory(article.title + ' ' + (article.description || ''))
+            }));
+          }
+        } catch (gnewsError) {
+          console.error('Error fetching from GNews:', gnewsError);
+        }
       }
       
-      // Format articles for our app
-      return data.articles.map(article => ({
-        id: article.url,
-        title: article.title,
-        source: article.source.name,
-        url: article.url,
-        publishedAt: article.publishedAt,
-        isBreaking: article.title.toLowerCase().includes('breaking') || 
-                  (new Date(article.publishedAt) > new Date(Date.now() - 3600000)),
-        category: determineCategory(article.title)
-      }));
+      console.warn('No news data available from APIs. Using fallback news data.');
+      return FALLBACK_NEWS;
+      
     } catch (error) {
-      console.error('Error fetching news:', error);
+      console.error('Error in news fetching process:', error);
       return FALLBACK_NEWS;
     }
   };
+
   
   // Determine news category based on headline keywords
   const determineCategory = (title) => {
