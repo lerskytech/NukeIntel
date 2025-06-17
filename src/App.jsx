@@ -1,23 +1,13 @@
 import { useState, useEffect } from 'react'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { Helmet } from 'react-helmet'
 import { motion } from 'framer-motion'
 import Header from './components/Header'
 import DoomsdayClock from './components/DoomsdayClock'
 import NewsWidget from './components/NewsWidget'
-import ChatWindow from './components/ChatWindow'
+import SocialIntelPanel from './components/SocialIntelPanel'
 import Footer from './components/Footer'
 
-// Create a React Query client with global settings
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 2,
-      staleTime: 60000, // 1 minute
-    },
-  },
-})
+// Configuration moved to main.jsx
 
 function App() {
   // Track if page has been loaded (for animations)
@@ -29,7 +19,6 @@ function App() {
   }, [])
 
   return (
-    <QueryClientProvider client={queryClient}>
       <div className="min-h-screen flex flex-col bg-darkest text-white relative overflow-hidden">
         <Helmet>
           <title>NukeIntel - Real-Time Global Threat Tracker</title>
@@ -62,12 +51,11 @@ function App() {
           
           <NewsWidget />
           
-          <ChatWindow />
+          <SocialIntelPanel />
         </motion.main>
         
         <Footer />
       </div>
-    </QueryClientProvider>
   )
 }
 

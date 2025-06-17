@@ -1,12 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiExternalLink } from 'react-icons/fi';
+import SocialShare from './SocialShare';
+import { fetchRelatedKeywords } from '../services/keywordService';
 
 /**
  * Modal component for displaying news articles inline without leaving the site
  * Provides iframe preview of news sources with fallback to external link
  */
 const NewsModal = ({ article, isOpen, onClose }) => {
+  const [relatedKeywords, setRelatedKeywords] = useState([]);
+  
+  // Fetch related keywords when article changes
+  useEffect(() => {
+    if (article && isOpen) {
+      const getKeywords = async () => {
+        const keywords = await fetchRelatedKeywords(article);
+        setRelatedKeywords(keywords);
+      };
+      getKeywords();
+    }
+  }, [article, isOpen]);
   // Close modal on escape key
   useEffect(() => {
     const handleEscKey = (e) => {
@@ -57,6 +71,9 @@ const NewsModal = ({ article, isOpen, onClose }) => {
             <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-midnight">
               <h2 className="text-xl font-bold text-white truncate pr-4">{article.title}</h2>
               <div className="flex items-center space-x-2">
+                {/* Social Share Component */}
+                <SocialShare article={article} relatedKeywords={relatedKeywords} />
+                
                 <a 
                   href={article.url}
                   target="_blank"
@@ -89,6 +106,23 @@ const NewsModal = ({ article, isOpen, onClose }) => {
                   <h3 className="text-lg font-medium text-white mb-2">Description</h3>
                   <p className="text-gray-300">{article.description}</p>
                 </div>
+                
+                {/* Keywords/Tags for the article */}
+                {relatedKeywords.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="text-lg font-medium text-white mb-2">Related Topics</h3>
+                    <div className="flex flex-wrap gap-1">
+                      {relatedKeywords.map((keyword, index) => (
+                        <span 
+                          key={index}
+                          className="text-xs px-2 py-1 rounded-full bg-gray-800 text-neon-blue"
+                        >
+                          #{keyword}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 {article.category && (
                   <div className="mb-4">

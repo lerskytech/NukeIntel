@@ -1,16 +1,18 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { FiClock, FiAlertTriangle } from 'react-icons/fi'
+import UserProfile from './UserProfile'
 
 const Header = () => {
   return (
     <motion.header 
-      className="py-8 px-4 text-center relative border-b border-gray-800"
+      className="py-8 px-4 relative border-b border-gray-800"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between">
+        <div className="text-center md:text-left mb-4 md:mb-0">
         <motion.div 
           className="inline-flex items-center justify-center mb-3"
           initial={{ scale: 0.9 }}
@@ -48,6 +50,12 @@ const Header = () => {
           <FiAlertTriangle className="animate-pulse-slow" size={16} />
           <p className="font-medium">Real-time global threat monitoring</p>
         </motion.div>
+        </div>
+        
+        {/* User Profile component */}
+        <div className="md:absolute md:right-6 md:top-6">
+          <UserProfile />
+        </div>
       </div>
     </motion.header>
   )
