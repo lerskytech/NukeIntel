@@ -151,7 +151,7 @@ const NewsWidget = () => {
               {news?.map((item, index) => (
                 <motion.div
                   key={item.id || `news-${index}`}
-                  className="block p-4 hover:bg-gray-900 transition-colors cursor-pointer"
+                  className="block p-4 hover:bg-gray-900 transition-colors cursor-pointer group"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   whileHover={{ backgroundColor: 'rgba(50, 50, 50, 0.3)' }}
@@ -168,13 +168,14 @@ const NewsWidget = () => {
                 >
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1">
-                      <h3 className="font-medium text-white hover:text-neon-blue transition-colors">
+                      <h3 className="font-medium text-white group-hover:text-neon-blue transition-colors flex items-center">
                         {item.isBreaking && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-neon-red text-white mr-2 animate-pulse-alert">
                             BREAKING
                           </span>
                         )}
-                        {item.title}
+                        <span className="hover:underline">{item.title}</span>
+                        <FiExternalLink className="inline-flex ml-2 text-neon-blue" size={16} />
                       </h3>
                       {item.description && (
                         <p className="text-sm text-gray-400 mt-1 line-clamp-2">{item.description}</p>
@@ -184,14 +185,32 @@ const NewsWidget = () => {
                         <span className="mx-2 text-gray-600">•</span>
                         <span className="text-gray-500">{formatRelativeTime(item.publishedAt)}</span>
                       </div>
+                      <div className="mt-3">
+                        <button 
+                          className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-neon-blue border border-neon-blue/30 hover:border-neon-blue/70 text-xs font-medium rounded-md transition-all flex items-center shadow-sm hover:shadow-neon-blue/20"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent triggering the parent onClick
+                            if (item.url) {
+                              window.open(item.url, '_blank', 'noopener,noreferrer');
+                            } else {
+                              window.open(`https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`, '_blank', 'noopener,noreferrer');
+                            }
+                          }}
+                        >
+                          Read Article <FiExternalLink className="ml-1.5" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      {item.url ? (
-                        <FiExternalLink className="text-neon-blue flex-shrink-0" size={18} />
-                      ) : (
-                        <FiExternalLink className="text-gray-500 flex-shrink-0" size={18} />
-                      )}
-                    </div>
+                    {item.imageUrl && (
+                      <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded">
+                        <img 
+                          src={item.imageUrl} 
+                          alt={item.title} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}
