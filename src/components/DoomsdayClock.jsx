@@ -18,7 +18,7 @@ const DoomsdayClock = () => {
   // Extract Doomsday Clock data from API response
   const { 
     minutesToMidnight = 1.5, 
-    secondsToMidnight = 90, // Direct from API or calculated from minutes
+    secondsToMidnight = 89, // Direct from API or calculated from minutes
     lastUpdated, 
     statement,
     fetchedLive
@@ -38,21 +38,14 @@ const DoomsdayClock = () => {
   // We show the exact seconds (not rounded) for more precision
   const displaySeconds = secondsToMidnight
   
-  // Calculate minute hand angle to show exactly 90 seconds to midnight
+  // Calculate minute hand angle to show exactly 89 seconds to midnight
   const getHandRotation = () => {
-    // 90 seconds = 1.5 minutes to midnight
-    // 1.5 minutes * 6 degrees per minute = 9 degrees
-    // At 11:58:30, minute hand is at 9 degrees before 12
-    return -9; // 9 degrees before midnight position (-90 + 81)
+    return -8.9; // fixed at 89 seconds (1.48333 minutes) to midnight
   }
   
-  // Hour hand position fixed at 11:58:30
+  // Hour hand position fixed at 11:58:31 (89 seconds to midnight)
   const getHourHandRotation = () => {
-    // At 11:58:30 the hour hand is slightly before 12
-    // Hour hand moves 30 degrees per hour
-    // 1.5 minutes is 1.5/60 = 0.025 of an hour
-    // 0.025 * 30 = 0.75 degrees
-    return -0.75; // Very close to midnight (12)
+    return -0.74; // fixed position for hour hand at 11:58:31
   }
 
   // Animation effect when the component mounts
@@ -336,7 +329,7 @@ const DoomsdayClock = () => {
           }}
         />
         
-        {/* Second hand - fixed at 90 seconds to midnight (30 seconds past 11:58) */}
+        {/* Second hand - fixed at 89 seconds to midnight (30 seconds past 11:58) */}
         <motion.div 
           className="absolute z-40"
           style={{
@@ -351,7 +344,7 @@ const DoomsdayClock = () => {
           initial={{ opacity: 0, rotate: 0 }}
           animate={{ 
             opacity: 0.8, 
-            rotate: 180 // Exactly at 6 o'clock position (180 degrees)
+            rotate: 186 // 31 seconds position (just past 6 o'clock)
           }}
           transition={{ 
             type: 'spring',

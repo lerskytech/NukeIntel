@@ -4,9 +4,9 @@ import axios from 'axios';
 // Accurate Doomsday Clock data as of the latest official update
 // Source: https://thebulletin.org/doomsday-clock/
 const CURRENT_CLOCK_DATA = {
-  minutesToMidnight: 90, // 90 seconds to midnight (official as of Jan 24, 2024)
-  lastUpdated: '2024-01-24T15:00:00Z',
-  statement: 'The Doomsday Clock stands at 90 seconds to midnight, the closest to global catastrophe it has ever been.',
+  minutesToMidnight: 89/60, // 89 seconds to midnight (latest update)
+  lastUpdated: '2025-06-17T12:53:02Z',
+  statement: 'The Doomsday Clock stands at 89 seconds to midnight, the closest to global catastrophe it has ever been.',
   source: 'Bulletin of the Atomic Scientists',
   url: 'https://thebulletin.org/doomsday-clock/',
   history: [
