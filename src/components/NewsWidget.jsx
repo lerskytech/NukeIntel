@@ -156,20 +156,13 @@ const NewsWidget = () => {
                   animate={{ opacity: 1 }}
                   whileHover={{ backgroundColor: 'rgba(50, 50, 50, 0.3)' }}
                   onClick={() => {
-                    // Direct browser navigation to source URL
+                    // Always use direct window.open with the source URL
                     if (item.url) {
-                      // Use standard window.open to ensure new tab behavior
-                      const newWindow = window.open();
-                      if (newWindow) {
-                        newWindow.opener = null; // Security: remove reference to opener
-                        newWindow.location.href = item.url;
-                      } else {
-                        // Fallback if popup blocked
-                        window.open(item.url, '_blank');
-                      }
+                      window.open(item.url, '_blank', 'noopener,noreferrer');
+                      console.log(`Opening article source: ${item.url}`);
                     } else {
-                      // Fallback to Bulletin search
-                      window.open(`https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`, '_blank');
+                      // Fallback to Bulletin search if no URL available
+                      window.open(`https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`, '_blank', 'noopener,noreferrer');
                     }
                   }}
                 >
