@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNews } from '../hooks/useNews';
 import { fetchRelatedKeywords } from '../services/keywordService';
 import UserProfile from './UserProfile';
+import XTimelineFeed from './XTimelineFeed';
 
 /**
  * SocialIntelPanel - A component for social sharing and insights
@@ -119,121 +120,136 @@ const SocialIntelPanel = () => {
         </button>
       </div>
       
-      {/* Content area */}
-      <div className="h-96 overflow-y-auto">
+      {/* Content area - increased height to accommodate timeline */}
+      <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 300px)', minHeight: '500px' }}>
         {/* If not signed in, show login prompt */}
         {!currentUser ? (
           <motion.div 
             className="flex flex-col items-center justify-center h-full p-6 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="mb-6">
-              <FiTwitter className="mx-auto text-neon-blue mb-4" size={40} />
-              <h3 className="text-xl font-bold text-white mb-2">Connect with X</h3>
-              <p className="text-gray-400 mb-6">
-                Sign in to share intelligence, follow threats, and join the global security conversation.
-              </p>
-              <UserProfile />
-            </div>
+            <FiTwitter size={40} className="text-neon-blue mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Connect with X</h3>
+            <p className="text-gray-400 mb-6 max-w-xs">
+              Sign in with your X account to share critical intelligence and engage with the global security conversation.
+            </p>
+            <UserProfile />
           </motion.div>
         ) : (
           <>
             {/* Trending Topics Section */}
-            <div className="p-4 border-b border-gray-800 bg-gray-900 bg-opacity-30">
-              <div className="flex items-center mb-3">
-                <FiTrendingUp className="text-neon-blue mr-2" size={16} />
-                <h3 className="text-sm font-medium text-gray-300">TRENDING SECURITY TOPICS</h3>
+            <div className="p-4 border-b border-gray-800">
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center text-sm text-gray-400">
+                  <FiTrendingUp size={14} className="mr-1 text-neon-blue" />
+                  <span>TRENDING SECURITY TOPICS</span>
+                </div>
+                
+                <button
+                  onClick={refetchNews}
+                  className={`p-1 rounded-full hover:bg-gray-800 ${newsLoading ? 'animate-spin text-neon-blue' : 'text-gray-500'}`}
+                  aria-label="Refresh news"
+                  disabled={newsLoading}
+                >
+                  <FiRefreshCw size={14} />
+                </button>
               </div>
               
               <div className="flex flex-wrap gap-2">
                 {trendingLoading ? (
-                  <div className="flex space-x-1 items-center py-1">
-                    <div className="w-2 h-2 bg-neon-blue rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-neon-blue rounded-full animate-pulse delay-150"></div>
-                    <div className="w-2 h-2 bg-neon-blue rounded-full animate-pulse delay-300"></div>
+                  <div className="flex space-x-2 py-2">
+                    <div className="h-7 w-24 rounded-full bg-gray-800 animate-pulse"></div>
+                    <div className="h-7 w-16 rounded-full bg-gray-800 animate-pulse"></div>
+                    <div className="h-7 w-20 rounded-full bg-gray-800 animate-pulse"></div>
                   </div>
                 ) : (
                   trendingTopics.map((topic, index) => (
-                    <motion.span
+                    <a
                       key={index}
-                      className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-neon-blue text-xs rounded-full cursor-pointer"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        window.open(`https://twitter.com/hashtag/${topic}`, '_blank');
-                      }}
+                      href={`https://twitter.com/search?q=%23${encodeURIComponent(topic)}&src=typed_query`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-gray-800 hover:bg-gray-700 text-white text-xs py-1 px-2.5 rounded-full transition-all duration-200"
                     >
                       #{topic}
-                    </motion.span>
+                    </a>
                   ))
                 )}
               </div>
             </div>
             
-            {/* News Articles for Sharing */}
-            <div className="p-4">
-              <AnimatePresence>
-                {newsLoading ? (
-                  <motion.div 
-                    className="flex justify-center py-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <div className="flex space-x-2 items-center">
-                      <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse"></div>
-                      <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse delay-150"></div>
-                      <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse delay-300"></div>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    className="space-y-3"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ staggerChildren: 0.1 }}
-                  >
-                    <h3 className="text-sm font-medium text-gray-400 mb-3">SHARE CRITICAL INTELLIGENCE</h3>
-                    
-                    {newsArticles?.slice(0, 5).map((article, index) => (
-                      <motion.div
-                        key={index}
-                        className="p-3 rounded-lg bg-gray-800 bg-opacity-40 border border-gray-800 hover:border-gray-700"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <div className="text-sm font-medium text-white mb-1 line-clamp-2">{article.title}</div>
-                        <div className="flex items-center justify-between mt-2">
-                          <div className="text-xs text-gray-400">
-                            {article.source || "News Source"}
+            {/* Two column layout for larger screens */}
+            <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* News Articles for Sharing - Column 1 */}
+              <div>
+                <AnimatePresence>
+                  {newsLoading ? (
+                    <motion.div 
+                      className="flex justify-center py-4"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <div className="flex space-x-2 items-center">
+                        <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse"></div>
+                        <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse delay-150"></div>
+                        <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse delay-300"></div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      className="space-y-3"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ staggerChildren: 0.1 }}
+                    >
+                      <h3 className="text-sm font-medium text-gray-400 mb-3">SHARE CRITICAL INTELLIGENCE</h3>
+                      
+                      {newsArticles?.slice(0, 5).map((article, index) => (
+                        <motion.div
+                          key={index}
+                          className="p-3 rounded-lg bg-gray-800 bg-opacity-40 border border-gray-800 hover:border-gray-700"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <div className="text-sm font-medium text-white mb-1 line-clamp-2">{article.title}</div>
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="text-xs text-gray-400">
+                              {article.source || "News Source"}
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <button
+                                className="p-1.5 hover:bg-gray-700 rounded-full text-gray-400 hover:text-neon-blue transition-colors"
+                                onClick={() => shareToTwitter(article)}
+                                aria-label="Share to X"
+                              >
+                                <FiShare2 size={14} />
+                              </button>
+                              <a
+                                href={article.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 hover:bg-gray-700 rounded-full text-gray-400 hover:text-neon-blue transition-colors"
+                                aria-label="Open article"
+                              >
+                                <FiExternalLink size={14} />
+                              </a>
+                            </div>
                           </div>
-                          <div className="flex items-center space-x-1">
-                            <button
-                              className="p-1.5 hover:bg-gray-700 rounded-full text-gray-400 hover:text-neon-blue transition-colors"
-                              onClick={() => shareToTwitter(article)}
-                              aria-label="Share to X"
-                            >
-                              <FiShare2 size={14} />
-                            </button>
-                            <a
-                              href={article.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-1.5 hover:bg-gray-700 rounded-full text-gray-400 hover:text-neon-blue transition-colors"
-                              aria-label="Open article"
-                            >
-                              <FiExternalLink size={14} />
-                            </a>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              
+              {/* X Timeline Feed - Column 2 */}
+              <div className="mb-4">
+                <XTimelineFeed keywords={trendingTopics} defaultKeyword="NukeIntel" />
+              </div>
             </div>
           </>
         )}
@@ -250,13 +266,13 @@ const SocialIntelPanel = () => {
         {currentUser && (
           <div className="flex">
             <a
-              href="https://twitter.com/search?q=%23DoomsdayClock&src=typed_query"
+              href="https://twitter.com/intent/tweet?hashtags=NukeIntel,DoomsdayClock"
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center text-xs text-neon-blue hover:underline"
             >
               <FiMessageCircle size={12} className="mr-1" />
-              Join Conversation
+              Start a New Thread
             </a>
           </div>
         )}
