@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNews } from '../hooks/useNews';
-import { FiAlertCircle, FiExternalLink, FiFilter, FiRefreshCw } from 'react-icons/fi';
+import { FiRefreshCw, FiExternalLink, FiFilter, FiAlertCircle } from 'react-icons/fi';
 
 const NewsWidget = () => {
   const [activeCategory, setActiveCategory] = useState(null);
@@ -143,8 +143,12 @@ const NewsWidget = () => {
               </button>
             </div>
           ) : news?.length === 0 ? (
-            <div className="p-6 text-center">
-              <p className="text-gray-400">No news found for this filter</p>
+            <div className="p-6 text-center flex flex-col items-center">
+              <div className="mb-4 text-neon-blue/70">
+                <FiAlertCircle size={28} />
+              </div>
+              <p className="text-gray-300 mb-2">No verified news sources available</p>
+              <p className="text-gray-500 text-sm">We only display legitimate news articles from verified sources.<br/>Please check back soon for updates.</p>
             </div>
           ) : (
             <>

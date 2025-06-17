@@ -1,62 +1,29 @@
 import { useQuery } from 'react-query';
 import axios from 'axios';
 
-// Fallback data in case API call fails
-const FALLBACK_NEWS = [
-  {
-    id: 'fallback-1',
-    title: 'Tensions Rise as Nuclear Powers Exchange Warnings',
-    source: 'Global News Network',
-    url: '#',
-    publishedAt: new Date().toISOString(),
-    isBreaking: true,
-    category: 'nuclear'
-  },
-  {
-    id: 'fallback-2',
-    title: 'Scientists Warn of Climate Tipping Points Approaching',
-    source: 'Science Daily',
-    url: '#',
-    publishedAt: new Date(Date.now() - 3600000).toISOString(),
-    isBreaking: false,
-    category: 'climate'
-  },
-  {
-    id: 'fallback-3',
-    title: 'UN Security Council Calls Emergency Meeting on Missile Tests',
-    source: 'World Affairs',
-    url: '#',
-    publishedAt: new Date(Date.now() - 7200000).toISOString(),
-    isBreaking: true,
-    category: 'military'
-  },
-  {
-    id: 'fallback-4',
-    title: 'New AI System Raises Concerns About Autonomous Weapons',
-    source: 'Tech Review',
-    url: '#',
-    publishedAt: new Date(Date.now() - 10800000).toISOString(),
-    isBreaking: false,
-    category: 'technology'
-  },
-  {
-    id: 'fallback-5',
-    title: 'Diplomatic Channels Reopen Between Nuclear Powers',
-    source: 'Diplomatic Times',
-    url: '#', 
-    publishedAt: new Date(Date.now() - 14400000).toISOString(),
-    isBreaking: false,
-    category: 'diplomacy'
-  }
-];
-
 /**
  * Keywords to search for when fetching news
+ * Related to nuclear threats, global catastrophe, etc.
  */
 const SEARCH_KEYWORDS = [
-  'nuclear', 'doomsday', 'missile', 'ICBM', 'war', 
-  'Putin', 'NATO', 'Iran', 'Israel', 'North Korea', 
-  'radiation', 'atomic', 'Biden', 'China', 'military', 
+  'nuclear weapon', 'atomic', 'doomsday', 'nuclear threat',
+  'nuclear missile', 'nuclear test', 'nuclear arsenal',
+  'atomic scientists', 'nuclear war', 'nuclear attack',
+  'fallout', 'radiation', 'uranium', 'plutonium',
+  'nuclear proliferation', 'nuclear deterrence', 'treaty',
+  'climate catastrophe', 'climate emergency', 'extinction',
+  'global catastrophe', 'existential risk', 'apocalypse',
+  'nuclear treaty', 'arms control', 'doomsday clock',
+  'radiation leak', 'nuclear power', 'nuclear accident',
+  'nuclear disaster', 'ICBM', 'ballistic missile',
+  'hydrogen bomb', 'nuclear winter', 'mutually assured destruction', 
+  'nuclear command', 'strategic forces', 'nuclear policy',
+  'nuclear posture', 'first strike', 'second strike',
+  'nuclear silo', 'missile defense', 'nuclear submarine',
+  'radiation fallout', 'uranium enrichment', 'centrifuge',
+  'plutonium production', 'nuclear facility', 'strategic bomber',
+  'tactical nuclear', 'kiloton', 'megaton', 'warhead',
+  'nuclear stockpile', 'disarmament', 'bulletin atomic',
   'rocket', 'explosion', 'nuclear alert'
 ];
 
@@ -83,11 +50,26 @@ export const useNews = (category = null) => {
           console.log('Fetching news from NewsAPI...');
           const { data } = await axios.get(url);
           
-          // If we got articles, format and return them
+          // If we got articles, validate and filter them first
           if (data.articles && data.articles.length > 0) {
-            console.log(`Successfully fetched ${data.articles.length} articles from NewsAPI`);
+            // Filter out articles with no URL or invalid URLs
+            const validArticles = data.articles.filter(article => {
+              return article.url && 
+                typeof article.url === 'string' && 
+                article.url.startsWith('http') &&
+                article.title && 
+                article.source && 
+                article.source.name;
+            });
             
-            return data.articles.map(article => ({
+            console.log(`Successfully fetched ${validArticles.length} valid articles from NewsAPI`);
+            
+            if (validArticles.length === 0) {
+              console.warn('No valid articles found in NewsAPI response');
+              return null; // Continue to next source
+            }
+            
+            return validArticles.map(article => ({
               id: article.url,
               title: article.title,
               description: article.description,
@@ -117,9 +99,24 @@ export const useNews = (category = null) => {
           const { data } = await axios.get(gnewsUrl);
           
           if (data.articles && data.articles.length > 0) {
-            console.log(`Successfully fetched ${data.articles.length} articles from GNews`);
+            // Filter out articles with no URL or invalid URLs
+            const validArticles = data.articles.filter(article => {
+              return article.url && 
+                typeof article.url === 'string' && 
+                article.url.startsWith('http') &&
+                article.title && 
+                article.source && 
+                article.source.name;
+            });
             
-            return data.articles.map(article => ({
+            console.log(`Successfully fetched ${validArticles.length} valid articles from GNews`);
+            
+            if (validArticles.length === 0) {
+              console.warn('No valid articles found in GNews response');
+              return [];
+            }
+            
+            return validArticles.map(article => ({
               id: article.url,
               title: article.title,
               description: article.description,
@@ -137,12 +134,12 @@ export const useNews = (category = null) => {
         }
       }
       
-      console.warn('No news data available from APIs. Using fallback news data.');
-      return FALLBACK_NEWS;
+      console.warn('No news data available from APIs.');
+      return []; // Return empty array instead of fallbacks to ensure only real news
       
     } catch (error) {
       console.error('Error in news fetching process:', error);
-      return FALLBACK_NEWS;
+      return []; // Return empty array instead of fallbacks to ensure only real news
     }
   };
 
