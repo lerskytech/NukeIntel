@@ -5,8 +5,28 @@ import { FiRefreshCw, FiExternalLink, FiFilter, FiAlertCircle } from 'react-icon
 
 const NewsWidget = () => {
   const [activeCategory, setActiveCategory] = useState(null);
-  const { data: news, isLoading, isError, refetch } = useNews(activeCategory);
+  const { data: rawNews, isLoading, isError, refetch } = useNews(activeCategory);
   const [expanded, setExpanded] = useState(true);
+  
+  // Additional client-side filter to ensure only real articles with valid URLs are displayed
+  // This serves as a final safety check against any placeholder or mock data
+  const news = React.useMemo(() => {
+    if (!rawNews || !Array.isArray(rawNews)) return [];
+    
+    return rawNews.filter(article => {
+      // Verify we have a legitimate article with real URL
+      return article && 
+        article.url && 
+        typeof article.url === 'string' && 
+        article.url.startsWith('http') &&
+        article.url !== '#' &&
+        article.title &&
+        article.source && 
+        // Filter out known placeholder sources
+        !['Global News Network', 'Science Daily', 'World Affairs', 
+          'Tech Review', 'Diplomatic Times', 'Example Source'].includes(article.source);
+    });
+  }, [rawNews]);
 
   // Categories for filtering
   const categories = [

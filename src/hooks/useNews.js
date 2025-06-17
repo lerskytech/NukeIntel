@@ -157,10 +157,15 @@ export const useNews = (category = null) => {
 
   return useQuery(['news', category], fetchNews, {
     refetchOnWindowFocus: false,
-    staleTime: 300000, // 5 minutes
-    cacheTime: 600000, // 10 minutes
-    retry: 1,
-    select: data => category ? data.filter(article => article.category === category) : data,
-    initialData: FALLBACK_NEWS,
+    refetchInterval: 300000, // refetch every 5 minutes
+    initialData: [], // Empty array as initial data instead of fallbacks
+    select: data => {
+      if (category && category !== 'breaking') {
+        return data?.filter(article => article.category === category) || [];
+      } else if (category === 'breaking') {
+        return data?.filter(article => article.isBreaking) || [];
+      }
+      return data || [];
+    }
   });
 };
