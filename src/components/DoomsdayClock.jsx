@@ -38,25 +38,21 @@ const DoomsdayClock = () => {
   // We show the exact seconds (not rounded) for more precision
   const displaySeconds = secondsToMidnight
   
-  // Calculate clock hand angle based on minutes to midnight
-  // For precision, we calculate the exact angle based on seconds to midnight
-  const getHandRotation = (secondsToMidnight) => {
-    // Convert seconds to minutes for the rotation calculation
-    // Each minute is 6 degrees on the clock (360 degrees / 60 minutes)
-    // We anchor at 12 o'clock position (270 degrees in CSS rotation system)
-    const minutes = secondsToMidnight / 60;
-    return minutes * 6 - 90; // -90 adjusts for CSS rotation starting from 3 o'clock
+  // Calculate minute hand angle to show exactly 90 seconds to midnight
+  const getHandRotation = () => {
+    // 90 seconds = 1.5 minutes to midnight
+    // 1.5 minutes * 6 degrees per minute = 9 degrees
+    // At 11:58:30, minute hand is at 9 degrees before 12
+    return -9; // 9 degrees before midnight position (-90 + 81)
   }
   
-  // Calculate hour hand position based on minutes to midnight
+  // Hour hand position fixed at 11:58:30
   const getHourHandRotation = () => {
-    // For the Doomsday Clock, we want the hour hand close to midnight (12)
-    // It should be slightly before 12 based on the minutes to midnight
-    // Each hour is 30 degrees (360 degrees / 12 hours)
-    // Each minute contributes 0.5 degrees to the hour hand (30 degrees / 60 minutes)
-    
-    // Fixed position at 11:58:30 PM to indicate we're close to midnight
-    return -30; // 30 degrees before midnight position
+    // At 11:58:30 the hour hand is slightly before 12
+    // Hour hand moves 30 degrees per hour
+    // 1.5 minutes is 1.5/60 = 0.025 of an hour
+    // 0.025 * 30 = 0.75 degrees
+    return -0.75; // Very close to midnight (12)
   }
 
   // Animation effect when the component mounts
@@ -68,29 +64,24 @@ const DoomsdayClock = () => {
     return () => clearTimeout(timer);
   }, []);
   
-  // Real-time ticking effect with pulsing animation
+  // Static pulsing effect without ticking animation
+  // We keep the pulse effect for visual interest but remove the second hand ticking
   useEffect(() => {
-    // Main interval for second hand ticking
-    const interval = setInterval(() => {
-      // We need to animate the seconds in a way that shows their significance
-      // For a more dramatic effect, pulse every 10 seconds
-      setCurrentSeconds(prev => {
-        const next = (prev + 1) % 60;
-        if (next % 10 === 0) setPulseEffect(true);
-        return next;
-      });
-    }, 1000);
-    
-    // Reset pulse effect after 500ms
+    // Set pulse effect on a slow interval for visual interest
     const pulseInterval = setInterval(() => {
-      if (pulseEffect) setPulseEffect(false);
-    }, 500);
+      setPulseEffect(prev => !prev);
+    }, 3000);
     
     return () => {
-      clearInterval(interval);
       clearInterval(pulseInterval);
     };
-  }, [pulseEffect]);
+  }, []);
+  
+  // Set current seconds to represent the 30 seconds position on the clock
+  // This ensures all calculations and displays show the correct static time
+  useEffect(() => {
+    setCurrentSeconds(30); // 30 seconds fixed position
+  }, []);
   
   // Format the last updated date
   const formatLastUpdated = (dateString) => {
@@ -333,7 +324,7 @@ const DoomsdayClock = () => {
           initial={{ opacity: 0, rotate: -180 }}
           animate={{ 
             opacity: 1, 
-            rotate: getHandRotation(secondsToMidnight)
+            rotate: getHandRotation()
           }}
           transition={{ 
             type: 'spring',
@@ -343,7 +334,7 @@ const DoomsdayClock = () => {
           }}
         />
         
-        {/* Second hand - very thin */}
+        {/* Second hand - fixed at 90 seconds to midnight (30 seconds past 11:58) */}
         <motion.div 
           className="absolute z-40"
           style={{
@@ -355,12 +346,17 @@ const DoomsdayClock = () => {
             transformOrigin: 'bottom center',
             boxShadow: '0 0 2px rgba(255, 0, 0, 0.5)'
           }}
-          initial={{ opacity: 0, rotate: 0 }}
+          initial={{ opacity: 0, rotate: -90 }}
           animate={{ 
             opacity: 0.8, 
-            rotate: currentSeconds * 6 - 90 // Convert seconds to degrees
+            rotate: -90 + (30 * 6) // 30 seconds × 6° per second = 180° from 9 o'clock
           }}
-          transition={{ type: 'tween' }}
+          transition={{ 
+            type: 'spring',
+            stiffness: 50,
+            damping: 15,
+            delay: 0.6
+          }}
         />
         
         {/* Center dot with bright red glow - matches the screenshot */}
