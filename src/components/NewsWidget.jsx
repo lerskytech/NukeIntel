@@ -149,22 +149,17 @@ const NewsWidget = () => {
           ) : (
             <>
               {news?.map((item, index) => (
-                <motion.a
+                <motion.div
                   key={item.id || `news-${index}`}
-                  href={item.url || `https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-4 hover:bg-gray-900 transition-colors"
+                  className="block p-4 hover:bg-gray-900 transition-colors cursor-pointer"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   whileHover={{ backgroundColor: 'rgba(50, 50, 50, 0.3)' }}
-                  onClick={(e) => {
-                    if (!item.url) {
-                      e.preventDefault();
-                      window.open(`https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`, '_blank', 'noopener,noreferrer');
-                    }
-                    // Track clicks for analytics if needed
-                    console.log(`Clicked news: ${item.title}`);
+                  onClick={() => {
+                    // Open in new tab using window.open for consistent behavior across browsers
+                    const url = item.url || `https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`;
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                    console.log(`Opened news in new tab: ${item.title}`);
                   }}
                 >
                   <div className="flex justify-between items-start gap-4">
@@ -194,7 +189,7 @@ const NewsWidget = () => {
                       )}
                     </div>
                   </div>
-                </motion.a>
+                </motion.div>
               ))}
               <div className="p-3 bg-midnight border-t border-gray-800">
                 <a 
