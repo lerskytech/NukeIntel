@@ -1,19 +1,26 @@
 import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useChat } from '../hooks/useChat'
+import { useNews } from '../hooks/useNews'
+import { FiSend, FiRefreshCw, FiX } from 'react-icons/fi'
 
 const ChatWindow = () => {
-  const [chatHistory, setChatHistory] = useState([]);
+  const { messages, isLoading, error, sendMessage, clearChat } = useChat();
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
   const chatContainerRef = useRef(null);
   
-  // Demo responses for the chat
-  const demoResponses = [
-    "The Doomsday Clock currently stands at 90 seconds to midnight, the closest it's ever been to global catastrophe since its creation in 1947.",
-    "Climate change remains one of the major factors influencing the Doomsday Clock setting. Rising global temperatures and extreme weather events continue to pose existential threats.",
-    "The ongoing risk of nuclear conflict keeps the Doomsday Clock near midnight. There are approximately 13,000 nuclear warheads in the world today.",
-    "Emerging technologies like AI present both opportunities and risks that the Bulletin of the Atomic Scientists considers when setting the Doomsday Clock.",
-    "The furthest the Doomsday Clock has ever been from midnight was 17 minutes in 1991, following the end of the Cold War and signing of the Strategic Arms Reduction Treaty."
+  // Get the latest news for context enhancement
+  const { data: newsData } = useNews();
+  
+  // Topic suggestions for the user
+  const topicSuggestions = [
+    "What does the Doomsday Clock mean?",
+    "Why is the clock at 90 seconds?",
+    "How close were we during the Cold War?",
+    "What are today's biggest threats?",
+    "How can we reduce nuclear risks?",
+    "What's the latest climate threat?"
   ];
   
   // Scroll to bottom of chat when new messages appear
@@ -21,113 +28,205 @@ const ChatWindow = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [chatHistory]);
+    // Show suggestions when no messages
+    if (messages.length === 0 && suggestions.length === 0) {
+      setSuggestions(topicSuggestions.slice(0, 3));
+    } else if (messages.length > 0) {
+      setSuggestions([]);
+    }
+  }, [messages]);
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (input.trim() === '') return;
     
-    // Add user message to chat
-    setChatHistory(prev => [...prev, { role: 'user', content: input }]);
-    setInput('');
-    setLoading(true);
+    // Clear suggestions once user starts chatting
+    setSuggestions([]);
     
-    // Simulate AI thinking time
-    setTimeout(() => {
-      try {
-        // Get a random demo response
-        const randomIndex = Math.floor(Math.random() * demoResponses.length);
-        const response = demoResponses[randomIndex];
-        
-        setChatHistory(prev => [...prev, { role: 'ai', content: response }]);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to get a response. Please try again.');
-        setLoading(false);
-      }
-    }, 1000);
+    // Get the message content
+    const messageContent = input;
+    setInput('');
+    
+    try {
+      // Get latest news for context
+      const newsContext = newsData?.slice(0, 5) || [];
+      
+      // Send the message with news context
+      await sendMessage(messageContent, newsContext);
+    } catch (err) {
+      console.error('Error in chat submission:', err);
+      // Error is handled by useChat hook
+    }
+  };
+  
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion) => {
+    setInput(suggestion);
+    // Submit the form programmatically
+    handleSubmit(new Event('submit'));
   };
   
   return (
-    <div className="w-full max-w-md mx-auto bg-dark border border-gray-800 rounded-xl overflow-hidden">
-      <div className="p-4 bg-gray-900 border-b border-gray-800">
-        <h2 className="text-xl font-bold neon-text-yellow text-center">Ask the Clock</h2>
+    <motion.div 
+      className="w-full max-w-md mx-auto rounded-xl overflow-hidden shadow-xl relative border border-gray-800"
+      style={{ background: 'linear-gradient(to bottom, #121212, #0a0a0a)' }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="px-5 py-4 border-b border-gray-800 flex justify-between items-center bg-midnight">
+        <motion.h2 
+          className="text-xl font-bold text-neon-yellow"
+          style={{ textShadow: '0 0 8px rgba(255, 253, 56, 0.7)' }}
+          animate={{ textShadow: ['0 0 8px rgba(255, 253, 56, 0.7)', '0 0 15px rgba(255, 253, 56, 1)', '0 0 8px rgba(255, 253, 56, 0.7)'] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          Ask the Clock
+        </motion.h2>
+        
+        {messages.length > 0 && (
+          <button 
+            onClick={clearChat} 
+            className="p-1.5 rounded-full hover:bg-gray-800 text-gray-500 hover:text-gray-300 transition-colors"
+            aria-label="Clear chat history"
+          >
+            <FiRefreshCw size={16} />
+          </button>
+        )}
       </div>
       
       {/* Chat messages */}
       <div 
         ref={chatContainerRef}
-        className="p-4 h-80 overflow-y-auto flex flex-col gap-3"
+        className="p-4 h-96 overflow-y-auto flex flex-col gap-3"
         aria-live="polite"
+        style={{ scrollBehavior: 'smooth' }}
       >
-        {chatHistory.length === 0 ? (
-          <div className="text-gray-500 text-center mt-10">
-            Ask a question about the Doomsday Clock, global threats, or nuclear risk.
-          </div>
-        ) : (
-          chatHistory.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+        <AnimatePresence>
+          {messages.length === 0 ? (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center h-full"
             >
-              <div
-                className={`rounded-2xl px-4 py-2 max-w-[80%] ${
-                  message.role === 'user'
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-800 text-white border border-gray-700'
-                }`}
-              >
-                {message.content}
+              <div className="text-gray-400 text-center mb-6 max-w-xs">
+                <p className="mb-3">Ask about the Doomsday Clock, nuclear threats, or current global risks.</p>
               </div>
-            </div>
-          ))
-        )}
-        
-        {/* Loading indicator */}
-        {loading && (
-          <div className="flex items-center gap-2 text-gray-400">
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-300"></div>
-            <span className="text-sm">AI is thinking...</span>
-          </div>
-        )}
+              
+              {/* Topic suggestions */}
+              <div className="flex flex-col gap-2 w-full max-w-xs">
+                {suggestions.map((suggestion, idx) => (
+                  <motion.button
+                    key={`suggestion-${idx}`}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-left border border-gray-700 rounded-lg text-sm text-gray-200 hover:text-white transition-colors"
+                    whileHover={{ scale: 1.02, backgroundColor: 'rgba(75, 75, 75, 0.5)' }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                  >
+                    {suggestion}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            messages.map((message, index) => (
+              <motion.div
+                key={`message-${index}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <motion.div
+                  className={`rounded-2xl px-4 py-3 max-w-[85%] shadow-md ${
+                    message.role === 'user'
+                      ? 'bg-gray-700 text-white'
+                      : 'bg-midnight text-white border border-gray-700'
+                  }`}
+                  initial={{ scale: 0.95 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 150, damping: 10 }}
+                >
+                  {message.content}
+                </motion.div>
+              </motion.div>
+            ))
+          )}
+          
+          {/* Loading indicator */}
+          {isLoading && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-2 text-gray-400 mt-3 bg-gray-900 bg-opacity-40 self-start p-3 rounded-xl"
+            >
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-neon-blue rounded-full animate-pulse-fast"></div>
+                <div className="w-2 h-2 bg-neon-blue rounded-full animate-pulse-fast delay-150"></div>
+                <div className="w-2 h-2 bg-neon-blue rounded-full animate-pulse-fast delay-300"></div>
+              </div>
+              <span className="text-sm">AI is analyzing threats...</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
         
         {/* Error message */}
         {error && (
-          <div className="text-neon-red text-center p-2">
+          <motion.div 
+            className="text-neon-red p-3 rounded-lg bg-red-900 bg-opacity-20 text-center mt-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             {error}
-          </div>
+          </motion.div>
         )}
       </div>
       
       {/* Input form */}
-      <form onSubmit={handleSubmit} className="p-3 border-t border-gray-800 flex gap-2">
-        <label htmlFor="chat-input" className="sr-only">Type your message</label>
-        <input
-          id="chat-input"
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about global threats..."
-          disabled={loading}
-          className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-1 focus:ring-neon-yellow"
-          aria-label="Type your message"
-        />
-        <button
+      <form 
+        onSubmit={handleSubmit} 
+        className="p-3 border-t border-gray-800 flex gap-2 items-center bg-gray-900 bg-opacity-50"
+      >
+        <motion.div className="relative flex-1">
+          <label htmlFor="chat-input" className="sr-only">Type your message</label>
+          <input
+            id="chat-input"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about nuclear risks, clock history..."
+            disabled={isLoading}
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-neon-blue text-sm transition-all duration-200"
+            aria-label="Type your message"
+          />
+          {input.trim() !== '' && (
+            <button
+              type="button"
+              onClick={() => setInput('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white p-1"
+              aria-label="Clear input"
+            >
+              <FiX size={14} />
+            </button>
+          )}
+        </motion.div>
+        
+        <motion.button
           type="submit"
-          disabled={loading || input.trim() === ''}
-          className={`px-4 py-2 rounded-lg ${
-            loading || input.trim() === ''
-              ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-              : 'bg-neon-red bg-opacity-70 text-white hover:bg-opacity-100'
-          } transition focus:outline-none focus:ring-2 focus:ring-neon-red focus:ring-opacity-50`}
+          disabled={isLoading || input.trim() === ''}
+          className={`p-3 rounded-lg ${isLoading || input.trim() === '' ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-neon-blue bg-opacity-80 text-white hover:bg-opacity-100'} transition-all duration-200 flex items-center justify-center`}
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05 }}
           aria-label="Send message"
         >
-          Send
-        </button>
+          <FiSend size={18} />
+        </motion.button>
       </form>
-    </div>
+    </motion.div>
   )
 }
 
