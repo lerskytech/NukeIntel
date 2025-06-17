@@ -36,11 +36,10 @@ const DoomsdayClock = ({ minutesToMidnight, digitalSeconds, onClockAdjust }) => 
             key={index} 
             className="absolute w-1 h-6 bg-gray-400 shadow-neon-yellow transform -translate-x-1/2"
             style={{
-              left: '50%',
+              left: index === 9 ? '8px' : '50%',
               top: index === 0 ? '8px' : 'auto',
               bottom: index === 6 ? '8px' : 'auto',
               right: index === 3 ? '8px' : 'auto',
-              left: index === 9 ? '8px' : 'auto',
               transform: `rotate(${index * 30}deg) translateY(-42px)`
             }}
           />
