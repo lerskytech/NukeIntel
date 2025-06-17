@@ -67,30 +67,40 @@ const SEARCH_KEYWORDS = [
 export const useNews = (category = null) => {
   const fetchNews = async () => {
     try {
-      // Note: You'll need a valid API key for these services
-      // For NewsAPI (requires API key): https://newsapi.org/
-      // For demo purposes, you might prefer using free RSS feeds or MediaStack
-
-      // Example with NewsAPI:
-      // const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
-      // const keywords = SEARCH_KEYWORDS.join(' OR ');
-      // const url = `https://newsapi.org/v2/everything?q=${keywords}&sortBy=publishedAt&language=en&pageSize=20&apiKey=${API_KEY}`;
+      // Try to get the API key from environment variables
+      const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
       
-      // const { data } = await axios.get(url);
+      // If no API key is available, fall back to static data
+      if (!API_KEY) {
+        console.warn('No NewsAPI key found. Using fallback news data.');
+        return FALLBACK_NEWS;
+      }
       
-      // return data.articles.map(article => ({
-      //   id: article.url,
-      //   title: article.title,
-      //   source: article.source.name,
-      //   url: article.url,
-      //   publishedAt: article.publishedAt,
-      //   isBreaking: article.title.toLowerCase().includes('breaking') || 
-      //              (new Date(article.publishedAt) > new Date(Date.now() - 3600000)),
-      //   category: determineCategory(article.title)
-      // }));
+      // Format keywords for API query
+      const keywords = SEARCH_KEYWORDS.join(' OR ');
       
-      // For demo purposes, we'll return fallback news
-      return FALLBACK_NEWS;
+      // Use NewsAPI to fetch real articles
+      const url = `https://newsapi.org/v2/everything?q=${keywords}&sortBy=publishedAt&language=en&pageSize=20&apiKey=${API_KEY}`;
+      
+      const { data } = await axios.get(url);
+      
+      // If no articles were returned, use fallback data
+      if (!data.articles || data.articles.length === 0) {
+        console.warn('No news articles found from API. Using fallback news data.');
+        return FALLBACK_NEWS;
+      }
+      
+      // Format articles for our app
+      return data.articles.map(article => ({
+        id: article.url,
+        title: article.title,
+        source: article.source.name,
+        url: article.url,
+        publishedAt: article.publishedAt,
+        isBreaking: article.title.toLowerCase().includes('breaking') || 
+                  (new Date(article.publishedAt) > new Date(Date.now() - 3600000)),
+        category: determineCategory(article.title)
+      }));
     } catch (error) {
       console.error('Error fetching news:', error);
       return FALLBACK_NEWS;
