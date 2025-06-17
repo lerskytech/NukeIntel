@@ -20,7 +20,7 @@ A React application featuring a Doomsday Clock visualization and an AI chat inte
 
 1. Clone this repository:
 ```
-git clone https://github.com/yourusername/NukeIntel.com.git
+git clone https://github.com/lerskytech/NukeIntel.com.git
 cd NukeIntel.com
 ```
 
