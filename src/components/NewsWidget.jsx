@@ -156,10 +156,21 @@ const NewsWidget = () => {
                   animate={{ opacity: 1 }}
                   whileHover={{ backgroundColor: 'rgba(50, 50, 50, 0.3)' }}
                   onClick={() => {
-                    // Open in new tab using window.open for consistent behavior across browsers
-                    const url = item.url || `https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`;
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                    console.log(`Opened news in new tab: ${item.title}`);
+                    // Direct browser navigation to source URL
+                    if (item.url) {
+                      // Use standard window.open to ensure new tab behavior
+                      const newWindow = window.open();
+                      if (newWindow) {
+                        newWindow.opener = null; // Security: remove reference to opener
+                        newWindow.location.href = item.url;
+                      } else {
+                        // Fallback if popup blocked
+                        window.open(item.url, '_blank');
+                      }
+                    } else {
+                      // Fallback to Bulletin search
+                      window.open(`https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`, '_blank');
+                    }
                   }}
                 >
                   <div className="flex justify-between items-start gap-4">
