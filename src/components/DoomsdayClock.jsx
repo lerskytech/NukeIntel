@@ -346,10 +346,10 @@ const DoomsdayClock = () => {
             transformOrigin: 'bottom center',
             boxShadow: '0 0 2px rgba(255, 0, 0, 0.5)'
           }}
-          initial={{ opacity: 0, rotate: -90 }}
+          initial={{ opacity: 0, rotate: 0 }}
           animate={{ 
             opacity: 0.8, 
-            rotate: -90 + (30 * 6) // 30 seconds × 6° per second = 180° from 9 o'clock
+            rotate: 180 // Exactly at 6 o'clock position (180 degrees)
           }}
           transition={{ 
             type: 'spring',
