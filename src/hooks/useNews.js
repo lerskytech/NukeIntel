@@ -59,25 +59,72 @@ const REAL_NEWS_SOURCES = [
 
 /**
  * Function to determine news category based on content
+ * Enhanced with more keywords for better category detection
  */
 const determineCategory = (text = "") => {
   const lowerText = text.toLowerCase();
   
-  if (lowerText.includes('nuclear') || lowerText.includes('atomic') || lowerText.includes('radiation'))
+  // Nuclear category keywords
+  if (lowerText.includes('nuclear') || 
+      lowerText.includes('atomic') || 
+      lowerText.includes('radiation') || 
+      lowerText.includes('radioactive') || 
+      lowerText.includes('uranium') || 
+      lowerText.includes('plutonium') || 
+      lowerText.includes('reactor') ||
+      lowerText.includes('fallout'))
     return 'nuclear';
     
-  if (lowerText.includes('military') || lowerText.includes('missile') || lowerText.includes('weapon'))
+  // Military category keywords
+  if (lowerText.includes('military') || 
+      lowerText.includes('missile') || 
+      lowerText.includes('weapon') || 
+      lowerText.includes('war') || 
+      lowerText.includes('defense') || 
+      lowerText.includes('army') || 
+      lowerText.includes('navy') ||
+      lowerText.includes('air force') ||
+      lowerText.includes('security') ||
+      lowerText.includes('conflict'))
     return 'military';
     
-  if (lowerText.includes('climate') || lowerText.includes('global warming'))
+  // Climate category keywords
+  if (lowerText.includes('climate') || 
+      lowerText.includes('global warming') || 
+      lowerText.includes('carbon') || 
+      lowerText.includes('emission') || 
+      lowerText.includes('environment') || 
+      lowerText.includes('temperature') ||
+      lowerText.includes('greenhouse') ||
+      lowerText.includes('sea level') ||
+      lowerText.includes('pollution'))
     return 'climate';
     
-  if (lowerText.includes('diplomacy') || lowerText.includes('treaty') || lowerText.includes('united nations'))
+  // Diplomacy category keywords
+  if (lowerText.includes('diplomacy') || 
+      lowerText.includes('treaty') || 
+      lowerText.includes('united nations') || 
+      lowerText.includes('agreement') || 
+      lowerText.includes('summit') || 
+      lowerText.includes('peace') || 
+      lowerText.includes('international') ||
+      lowerText.includes('bilateral') ||
+      lowerText.includes('negotiation'))
     return 'diplomacy';
     
-  if (lowerText.includes('technology') || lowerText.includes('ai') || lowerText.includes('cyber'))
+  // Technology category keywords
+  if (lowerText.includes('technology') || 
+      lowerText.includes('ai') || 
+      lowerText.includes('cyber') || 
+      lowerText.includes('artificial intelligence') || 
+      lowerText.includes('quantum') || 
+      lowerText.includes('digital') ||
+      lowerText.includes('robotics') ||
+      lowerText.includes('algorithm') ||
+      lowerText.includes('automation'))
     return 'technology';
     
+  // Default to nuclear category for doomsday clock context
   return 'nuclear';
 };
 

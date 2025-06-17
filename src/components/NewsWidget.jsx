@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNews } from '../hooks/useNews';
 import { FiRefreshCw, FiExternalLink, FiFilter, FiAlertCircle } from 'react-icons/fi';
+import NewsModal from './NewsModal';
 
 const NewsWidget = () => {
   const [activeCategory, setActiveCategory] = useState(null);
   const { data: rawNews, isLoading, isError, refetch } = useNews(activeCategory);
   const [expanded, setExpanded] = useState(true);
+  const [selectedArticle, setSelectedArticle] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Function to handle article selection for modal view
+  const handleArticleSelect = (article) => {
+    setSelectedArticle(article);
+    setIsModalOpen(true);
+    console.log('Opening article in modal:', article.title);
+  };
   
   // Additional client-side filter to ensure only real articles with valid URLs are displayed
   // This serves as a final safety check against any placeholder or mock data
-  const news = React.useMemo(() => {
+  const news = useMemo(() => {
     if (!rawNews || !Array.isArray(rawNews)) return [];
     
     // Log raw news data for debugging
@@ -39,11 +49,10 @@ const NewsWidget = () => {
   }, [rawNews]);
   
   // Debug: Log final news list
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('Final filtered news list:', news);
   }, [news]);
   
-
   // Categories for filtering
   const categories = [
     { id: null, name: 'All' },
@@ -101,94 +110,84 @@ const NewsWidget = () => {
             onClick={() => refetch()} 
             className="p-2 hover:bg-gray-800 rounded-full transition-colors"
             aria-label="Refresh news"
-            disabled={isLoading}
           >
-            <FiRefreshCw className={`${isLoading ? 'animate-spin text-neon-blue' : 'text-gray-400'}`} />
+            <FiRefreshCw 
+              className={`text-gray-400 ${isLoading ? 'animate-spin text-neon-blue' : ''}`} 
+              size={18} 
+            />
           </button>
           <button 
-            onClick={() => setExpanded(!expanded)}
+            onClick={() => setExpanded(!expanded)} 
             className="p-2 hover:bg-gray-800 rounded-full transition-colors"
-            aria-label={expanded ? 'Collapse news' : 'Expand news'}
+            aria-label={expanded ? "Collapse" : "Expand"}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 text-gray-400 transition-transform ${expanded ? 'transform rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <FiFilter className="text-gray-400" size={18} />
           </button>
         </div>
       </div>
-
-      {/* Mobile news ticker for small screens */}
-      <div className="md:hidden bg-gray-900 border-b border-gray-800 overflow-hidden">
-        <div className="relative flex items-center h-10 overflow-hidden">
-          <div className="animate-ticker whitespace-nowrap">
-            {news?.filter(item => item.isBreaking)?.map((item, index) => (
-              <span key={`ticker-${item.id}-${index}`} className="inline-block pr-8">
-                <span className="text-neon-red font-bold mr-2">BREAKING:</span> 
-                <span className="text-white">{item.title}</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Filter categories */}
+      
+      {/* Category filter */}
       {expanded && (
-        <div className="p-3 bg-gray-900 flex flex-wrap items-center gap-2 border-b border-gray-800">
-          <div className="flex items-center mr-2">
-            <FiFilter className="text-gray-500 mr-1" />
-            <span className="text-sm text-gray-400">Filter:</span>
-          </div>
+        <motion.div 
+          className="flex flex-wrap gap-2 p-3 bg-midnight border-b border-gray-800"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+        >
           {categories.map(category => (
             <button
-              key={category.id || 'all'}
-              onClick={() => setActiveCategory(category.id)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              key={category.id ?? 'all'}
+              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                 activeCategory === category.id 
-                  ? 'bg-neon-red text-white' 
+                  ? 'bg-neon-blue text-white' 
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
-              aria-pressed={activeCategory === category.id}
+              onClick={() => setActiveCategory(category.id)}
             >
               {category.name}
             </button>
           ))}
-        </div>
+        </motion.div>
       )}
-
-      {/* News content */}
+      
+      {/* News list */}
       {expanded && (
         <motion.div 
-          className="bg-gradient-to-b from-darkest to-darkest divide-y divide-gray-800"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          transition={{ duration: 0.3 }}
+          className="max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-700"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
         >
           {isLoading ? (
-            <div className="p-6 text-center">
-              <div className="inline-block animate-pulse-fast h-8 w-8 rounded-full bg-gray-800 mb-2"></div>
-              <p className="text-gray-400">Fetching latest news...</p>
+            <div className="flex justify-center items-center py-12">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              >
+                <FiRefreshCw className="text-neon-blue" size={30} />
+              </motion.div>
+              <span className="ml-3 text-gray-400">Loading news...</span>
             </div>
           ) : isError ? (
-            <div className="p-6 text-center">
-              <p className="text-neon-red mb-2">Unable to load news</p>
-              <button 
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <FiAlertCircle className="text-neon-red mb-4" size={40} />
+              <h3 className="text-lg font-medium text-white mb-2">Error loading news</h3>
+              <p className="text-gray-400 mb-4">Unable to retrieve news updates at this time.</p>
+              <button
                 onClick={() => refetch()}
-                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-sm text-white transition"
+                className="px-4 py-2 bg-neon-blue text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
               >
-                Try Again
+                <FiRefreshCw className="mr-2" size={16} /> Try again
               </button>
             </div>
-          ) : news?.length === 0 ? (
-            <div className="p-6 text-center flex flex-col items-center">
-              <div className="mb-4 text-neon-blue/70">
-                <FiAlertCircle size={28} />
-              </div>
-              <p className="text-gray-300 mb-2">No verified news sources available</p>
-              <p className="text-gray-500 text-sm">We only display legitimate news articles from verified sources.<br/>Please check back soon for updates.</p>
+          ) : news.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <FiAlertCircle className="text-neon-yellow mb-4" size={40} />
+              <h3 className="text-lg font-medium text-white mb-2">No verified news sources available</h3>
+              <p className="text-gray-400 mb-4">We couldn't find any verified news articles for this category.</p>
             </div>
           ) : (
             <>
-              {news?.map((item, index) => (
+              {news.map((item, index) => (
                 <motion.div
                   key={item.id || `news-${index}`}
                   className="block p-4 hover:bg-gray-900 transition-colors cursor-pointer group"
@@ -196,14 +195,8 @@ const NewsWidget = () => {
                   animate={{ opacity: 1 }}
                   whileHover={{ backgroundColor: 'rgba(50, 50, 50, 0.3)' }}
                   onClick={() => {
-                    // Always use direct window.open with the source URL
-                    if (item.url) {
-                      window.open(item.url, '_blank', 'noopener,noreferrer');
-                      console.log(`Opening article source: ${item.url}`);
-                    } else {
-                      // Fallback to Bulletin search if no URL available
-                      window.open(`https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`, '_blank', 'noopener,noreferrer');
-                    }
+                    // Open article in modal instead of leaving the site
+                    handleArticleSelect(item);
                   }}
                 >
                   <div className="flex justify-between items-start gap-4">
@@ -230,11 +223,7 @@ const NewsWidget = () => {
                           className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-neon-blue border border-neon-blue/30 hover:border-neon-blue/70 text-xs font-medium rounded-md transition-all flex items-center shadow-sm hover:shadow-neon-blue/20"
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent triggering the parent onClick
-                            if (item.url) {
-                              window.open(item.url, '_blank', 'noopener,noreferrer');
-                            } else {
-                              window.open(`https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`, '_blank', 'noopener,noreferrer');
-                            }
+                            handleArticleSelect(item); // Open in modal instead
                           }}
                         >
                           Read Article <FiExternalLink className="ml-1.5" />
@@ -267,6 +256,19 @@ const NewsWidget = () => {
             </>
           )}
         </motion.div>
+      )}
+      
+      {/* News Article Modal */}
+      {selectedArticle && (
+        <NewsModal 
+          article={selectedArticle} 
+          isOpen={isModalOpen} 
+          onClose={() => {
+            setIsModalOpen(false);
+            // Don't clear the article immediately for smoother transition
+            setTimeout(() => setSelectedArticle(null), 300);
+          }} 
+        />
       )}
     </motion.div>
   );
