@@ -32,9 +32,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen flex flex-col bg-darkest text-white relative overflow-hidden">
         <Helmet>
-          <title>Doomsday Clock - Real-Time Global Threat Tracker</title>
-          <meta name="description" content="Track the Doomsday Clock in real-time and monitor global threats including nuclear risk, climate change, and disruptive technologies." />
-          <meta property="og:title" content="Doomsday Clock - Real-Time Global Threat Tracker" />
+          <title>NukeIntel - Real-Time Global Threat Tracker</title>
+          <meta name="description" content="Track global nuclear threats in real-time and monitor risks including weapons proliferation, climate change, and disruptive technologies." />
+          <meta property="og:title" content="NukeIntel - Real-Time Global Threat Tracker" />
           <meta property="og:description" content="Live updates on how close we are to global catastrophe, according to the Bulletin of Atomic Scientists." />
           <meta name="theme-color" content="#0a0a0a" />
         </Helmet>
