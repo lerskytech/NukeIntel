@@ -148,20 +148,28 @@ const NewsWidget = () => {
             </div>
           ) : (
             <>
-              {news?.map((item) => (
+              {news?.map((item, index) => (
                 <motion.a
-                  key={item.id}
-                  href={item.url}
+                  key={item.id || `news-${index}`}
+                  href={item.url || `https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block p-4 hover:bg-gray-900 transition-colors"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   whileHover={{ backgroundColor: 'rgba(50, 50, 50, 0.3)' }}
+                  onClick={(e) => {
+                    if (!item.url) {
+                      e.preventDefault();
+                      window.open(`https://thebulletin.org/search-results/?_sf_s=${encodeURIComponent(item.title)}`, '_blank', 'noopener,noreferrer');
+                    }
+                    // Track clicks for analytics if needed
+                    console.log(`Clicked news: ${item.title}`);
+                  }}
                 >
                   <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <h3 className="font-medium text-white group-hover:text-neon-blue transition-colors">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-white hover:text-neon-blue transition-colors">
                         {item.isBreaking && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-neon-red text-white mr-2 animate-pulse-alert">
                             BREAKING
@@ -169,13 +177,22 @@ const NewsWidget = () => {
                         )}
                         {item.title}
                       </h3>
+                      {item.description && (
+                        <p className="text-sm text-gray-400 mt-1 line-clamp-2">{item.description}</p>
+                      )}
                       <div className="flex items-center mt-1 text-sm">
                         <span className="text-gray-400">{item.source}</span>
                         <span className="mx-2 text-gray-600">•</span>
                         <span className="text-gray-500">{formatRelativeTime(item.publishedAt)}</span>
                       </div>
                     </div>
-                    <FiExternalLink className="text-gray-500 flex-shrink-0" />
+                    <div className="flex items-center">
+                      {item.url ? (
+                        <FiExternalLink className="text-neon-blue flex-shrink-0" size={18} />
+                      ) : (
+                        <FiExternalLink className="text-gray-500 flex-shrink-0" size={18} />
+                      )}
+                    </div>
                   </div>
                 </motion.a>
               ))}
