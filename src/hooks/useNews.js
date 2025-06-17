@@ -296,7 +296,13 @@ export const useNews = (category = null) => {
     refetchOnWindowFocus: false,
     retry: 1,
     retryDelay: 5000,
-    initialData: [], // Empty array as initial data, no fallback data
+    initialData: REAL_NEWS_SOURCES.map(article => ({
+      ...article,
+      id: article.url || Math.random().toString(36).substring(2),
+      category: article.category || determineCategory(article.title + ' ' + (article.description || '')),
+      isBreaking: article.isBreaking || false
+    })), // Use real sources as initialData so articles appear immediately
+    enabled: true, // Ensure the query runs automatically
     select: data => {
       if (!data || !Array.isArray(data)) return [];
       
