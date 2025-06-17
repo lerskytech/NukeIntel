@@ -27,14 +27,14 @@ const Header = () => {
             <FiClock className="text-neon-red" size={24} />
           </motion.div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-            <span className="text-white">Doomsday</span>
+            <span className="text-white">Nuke</span>
             <motion.span 
               className="text-neon-red ml-2"
               style={{ textShadow: '0 0 10px rgba(255, 77, 77, 0.7)' }}
               animate={{ textShadow: ['0 0 10px rgba(255, 77, 77, 0.7)', '0 0 20px rgba(255, 77, 77, 1)', '0 0 10px rgba(255, 77, 77, 0.7)'] }}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             >
-              Clock
+              Intel
             </motion.span>
           </h1>
         </motion.div>
