@@ -13,9 +13,12 @@ const NewsWidget = () => {
   const news = React.useMemo(() => {
     if (!rawNews || !Array.isArray(rawNews)) return [];
     
+    // Log raw news data for debugging
+    console.log('Raw news received:', rawNews);
+    
     return rawNews.filter(article => {
       // Verify we have a legitimate article with real URL
-      return article && 
+      const isValid = article && 
         article.url && 
         typeof article.url === 'string' && 
         article.url.startsWith('http') &&
@@ -25,8 +28,21 @@ const NewsWidget = () => {
         // Filter out known placeholder sources
         !['Global News Network', 'Science Daily', 'World Affairs', 
           'Tech Review', 'Diplomatic Times', 'Example Source'].includes(article.source);
+          
+      // For debugging
+      if (!isValid && article) {
+        console.log('Filtering out invalid article:', article);
+      }
+      
+      return isValid;
     });
   }, [rawNews]);
+  
+  // Debug: Log final news list
+  React.useEffect(() => {
+    console.log('Final filtered news list:', news);
+  }, [news]);
+  
 
   // Categories for filtering
   const categories = [

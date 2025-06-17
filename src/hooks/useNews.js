@@ -88,11 +88,20 @@ const determineCategory = (text = "") => {
 export const useNews = (category = null) => {
   const fetchNews = async () => {
     try {
+      // GUARANTEED to have these real news sources
+      console.log('Starting with real news sources:', REAL_NEWS_SOURCES.length);
+      
       // Start with our reliable static news sources that have legitimate URLs
       let allArticles = [...REAL_NEWS_SOURCES].map(article => ({
         ...article,
-        id: article.url,
+        id: article.url || Math.random().toString(36).substring(2),
+        // Ensure these real sources always have a URL and all required properties
+        url: article.url,
+        title: article.title,
+        source: article.source,
+        publishedAt: article.publishedAt || new Date().toISOString(),
         category: article.category || determineCategory(article.title + ' ' + (article.description || '')),
+        isBreaking: article.isBreaking || false
       }));
       
       // Try NewsAPI if an API key is available
@@ -184,8 +193,22 @@ export const useNews = (category = null) => {
         // Continue with existing articles
       }
       
-      // Final safety filter to ensure all articles meet our criteria
-      const verifiedArticles = allArticles.filter(article => 
+      // Get the guaranteed real news sources first
+      const guaranteedSources = [...REAL_NEWS_SOURCES].map(article => ({
+        ...article,
+        id: article.url || Math.random().toString(36).substring(2),
+        url: article.url,
+        title: article.title,
+        source: article.source,
+        publishedAt: article.publishedAt || new Date().toISOString(),
+        category: article.category || determineCategory(article.title + ' ' + (article.description || '')),
+        isBreaking: article.isBreaking || false,
+        isGuaranteed: true // Mark these as guaranteed sources
+      }));
+      
+      // Final safety filter for API-sourced articles
+      const apiVerifiedArticles = allArticles.filter(article => 
+        !article.isGuaranteed && // Skip guaranteed sources in this filter
         article && 
         article.url && 
         typeof article.url === 'string' && 
@@ -197,12 +220,26 @@ export const useNews = (category = null) => {
         'Tech Review', 'Diplomatic Times', 'Example Source'].includes(article.source)
       );
       
-      console.log(`Returning ${verifiedArticles.length} verified news articles`);
+      // Combine guaranteed sources with API sources
+      const verifiedArticles = [...guaranteedSources, ...apiVerifiedArticles];
+      
+      console.log(`Returning ${verifiedArticles.length} verified news articles (including ${guaranteedSources.length} guaranteed sources)`);
       return verifiedArticles;
       
     } catch (error) {
       console.error('Error fetching news articles:', error);
-      return []; // Return empty array on error
+      // Even on error, return our guaranteed real news sources
+      console.log('Returning guaranteed real news sources despite error');
+      return [...REAL_NEWS_SOURCES].map(article => ({
+        ...article,
+        id: article.url || Math.random().toString(36).substring(2),
+        url: article.url,
+        title: article.title,
+        source: article.source,
+        publishedAt: article.publishedAt || new Date().toISOString(),
+        category: article.category || determineCategory(article.title + ' ' + (article.description || '')),
+        isBreaking: article.isBreaking || false
+      }));
     }
   };
 
