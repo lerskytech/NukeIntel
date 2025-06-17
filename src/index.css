@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans antialiased;
+  }
+}
+
+@layer components {
+  .neon-text {
+    @apply font-bold text-white;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 15px rgba(255, 7, 58, 0.5),
+                0 0 20px rgba(255, 7, 58, 0.3);
+  }
+  
+  .neon-text-orange {
+    @apply font-bold text-white;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 15px rgba(255, 124, 10, 0.5),
+                0 0 20px rgba(255, 124, 10, 0.3);
+  }
+  
+  .neon-text-yellow {
+    @apply font-bold text-white;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 15px rgba(255, 253, 56, 0.5),
+                0 0 20px rgba(255, 253, 56, 0.3);
+  }
+}
