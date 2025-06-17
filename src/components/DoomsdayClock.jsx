@@ -1,29 +1,49 @@
 import { useState, useEffect, useRef } from 'react'
 import ClockModal from './ClockModal'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useClockData } from '../hooks/useClockData'
+import { FiAlertTriangle } from 'react-icons/fi'
 
 const DoomsdayClock = () => {
   const [showModal, setShowModal] = useState(false)
   const [isAnimating, setIsAnimating] = useState(true)
-  const [secondsCounter, setSecondsCounter] = useState(0)
+  const [currentSeconds, setCurrentSeconds] = useState(0) // Track exact seconds for animation
+  const [pulseEffect, setPulseEffect] = useState(false) // For pulsing animation
   const clockRef = useRef(null)
+  const minuteHandRef = useRef(null)
 
   // Fetch clock data from API or use fallback
   const { data: clockData, isLoading, isError } = useClockData()
   
-  // Extract minutes to midnight from data
-  const minutesToMidnight = clockData?.minutesToMidnight / 60 || 1.5 // 90 seconds = 1.5 minutes
-  const digitalSeconds = clockData?.minutesToMidnight || 90
+  // Extract data from clock data
+  const secondsToMidnight = clockData?.minutesToMidnight || 90 // In seconds
+  const minutesToMidnight = secondsToMidnight / 60 // Convert to minutes (e.g. 90s = 1.5m)
   const lastUpdated = clockData?.lastUpdated || '2024-01-24T12:00:00Z'
   const statement = clockData?.statement || 'The Doomsday Clock stands at 90 seconds to midnight.'
   
+  // Derived state for display
+  // We show the exact seconds (not rounded) for more precision
+  const displaySeconds = secondsToMidnight
+  
   // Calculate clock hand angle based on minutes to midnight
-  // 1.5 minutes = 90 seconds to midnight = -4.5 degrees from vertical (12 o'clock)
-  const getHandRotation = (minutesToMidnight) => {
+  // For precision, we calculate the exact angle based on seconds to midnight
+  const getHandRotation = (secondsToMidnight) => {
+    // Convert seconds to minutes for the rotation calculation
     // Each minute is 6 degrees on the clock (360 degrees / 60 minutes)
-    // We need to rotate from the 12 o'clock position
-    return minutesToMidnight * 6;
+    // We anchor at 12 o'clock position (270 degrees in CSS rotation system)
+    const minutes = secondsToMidnight / 60;
+    return minutes * 6 - 90; // -90 adjusts for CSS rotation starting from 3 o'clock
+  }
+  
+  // Calculate hour hand position based on minutes to midnight
+  const getHourHandRotation = () => {
+    // For the Doomsday Clock, we want the hour hand close to midnight (12)
+    // It should be slightly before 12 based on the minutes to midnight
+    // Each hour is 30 degrees (360 degrees / 12 hours)
+    // Each minute contributes 0.5 degrees to the hour hand (30 degrees / 60 minutes)
+    
+    // Fixed position at 11:58:30 PM to indicate we're close to midnight
+    return -30; // 30 degrees before midnight position
   }
 
   // Animation effect when the component mounts
@@ -35,15 +55,29 @@ const DoomsdayClock = () => {
     return () => clearTimeout(timer);
   }, []);
   
-  // Optional effect for animating seconds ticking down
+  // Real-time ticking effect with pulsing animation
   useEffect(() => {
-    // Animate ticking seconds for dramatic effect
+    // Main interval for second hand ticking
     const interval = setInterval(() => {
-      setSecondsCounter(prev => (prev + 1) % 60);
+      // We need to animate the seconds in a way that shows their significance
+      // For a more dramatic effect, pulse every 10 seconds
+      setCurrentSeconds(prev => {
+        const next = (prev + 1) % 60;
+        if (next % 10 === 0) setPulseEffect(true);
+        return next;
+      });
     }, 1000);
     
-    return () => clearInterval(interval);
-  }, []);
+    // Reset pulse effect after 500ms
+    const pulseInterval = setInterval(() => {
+      if (pulseEffect) setPulseEffect(false);
+    }, 500);
+    
+    return () => {
+      clearInterval(interval);
+      clearInterval(pulseInterval);
+    };
+  }, [pulseEffect]);
   
   // Format the last updated date
   const formatLastUpdated = (dateString) => {
@@ -64,139 +98,353 @@ const DoomsdayClock = () => {
         <div className="text-neon-red mb-2" aria-live="polite">Using fallback data - couldn't connect to server</div>
       ) : null}
       
-      {/* Clock visualization */}
+      {/* Clock visualization - completely redesigned for accuracy and visual impact */}
       <motion.div 
-        className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-full border-4 border-gray-800 bg-darkest flex items-center justify-center mb-6"
-        style={{ boxShadow: '0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.8)' }}
+        className="relative w-72 h-72 sm:w-96 sm:h-96 md:w-[500px] md:h-[500px] rounded-full border-[6px] border-gray-700 bg-black flex items-center justify-center mb-8 overflow-hidden"
+        style={{ 
+          boxShadow: pulseEffect 
+            ? '0 0 30px rgba(0, 0, 0, 0.8), 0 0 60px rgba(255, 30, 50, 0.15), inset 0 0 40px rgba(0, 0, 0, 0.9)' 
+            : '0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(0, 0, 0, 0.9)',
+        }}
         role="img" 
         aria-label="Doomsday Clock visualization showing how close we are to midnight"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8 }}
       >
-        {/* Background glow effect */}
-        <div className="absolute inset-0 rounded-full bg-gradient-radial from-dark to-darkest opacity-80"></div>
+        {/* Deep black background with subtle texture */}
+        <div 
+          className="absolute inset-0 rounded-full bg-black"
+          style={{ 
+            backgroundImage: 'radial-gradient(circle, rgba(20,20,20,1) 0%, rgba(0,0,0,1) 100%)',
+            boxShadow: 'inset 0 0 50px rgba(0,0,0,0.8)' 
+          }}
+        />
         
-        {/* Clock ticks */}
-        {[...Array(12)].map((_, index) => (
-          <motion.div 
-            key={index} 
-            className="absolute w-1.5 h-6 bg-gray-300 shadow-neon-orange transform -translate-x-1/2"
-            style={{
-              left: '50%',
-              transformOrigin: 'bottom center',
-              transform: `rotate(${index * 30}deg) translateY(-46%)`,
-              opacity: index === 0 ? 1 : 0.8,
-              boxShadow: index === 0 ? '0 0 8px rgba(255, 0, 0, 0.8)' : ''
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: index === 0 ? 1 : 0.8 }}
-            transition={{ delay: index * 0.05 }}
-          />
-        ))}
+        {/* Clock face */}
+        <div className="absolute inset-2 rounded-full bg-black z-10"/>
         
-        {/* Smaller ticks */}
-        {[...Array(60)].map((_, index) => {
-          // Skip positions where large ticks are
-          if (index % 5 === 0) return null;
-          return (
-            <motion.div 
-              key={`small-${index}`} 
-              className="absolute w-0.5 h-3 bg-gray-600 transform -translate-x-1/2"
+        {/* Red danger zone - at top of clock (midnight) */}
+        <motion.div 
+          className="absolute w-[18%] h-[18%] z-20"
+          style={{ 
+            background: 'radial-gradient(circle, rgba(255,30,30,0.6) 0%, rgba(255,0,0,0) 100%)',
+            top: '3%',
+            left: '41%',
+          }}
+          animate={{ opacity: pulseEffect ? [0.5, 0.7, 0.5] : [0.3, 0.5, 0.3] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        />
+        
+        {/* Clock hour markers - much bolder and more professional */}
+        {[...Array(12)].map((_, index) => {
+          const hour = index === 0 ? 12 : index;
+          const isMainHour = hour === 12 || hour === 3 || hour === 6 || hour === 9;
+          const angle = index * 30;
+          const radians = (angle - 90) * (Math.PI / 180);
+          const radius = isMainHour ? 47 : 46; // Percentage of clock radius
+          const x = 50 + radius * Math.cos(radians);
+          const y = 50 + radius * Math.sin(radians);
+          
+          return isMainHour ? (
+            <motion.div
+              key={`hour-${index}`}
+              className="absolute text-xl md:text-2xl font-bold z-30"
               style={{
-                left: '50%',
-                transformOrigin: 'bottom center',
-                transform: `rotate(${index * 6}deg) translateY(-48%)`
+                left: `${x}%`,
+                top: `${y}%`,
+                transform: 'translate(-50%, -50%)',
+                color: hour === 12 ? '#ff1e3c' : 'rgba(255,255,255,0.85)', // Red for 12, white for others
+                textShadow: hour === 12 ? 
+                  '0 0 10px rgba(255, 30, 60, 0.9), 0 0 20px rgba(255, 30, 60, 0.6)' : 
+                  '0 0 5px rgba(255, 255, 255, 0.3)'
+              }}
+              animate={{
+                textShadow: hour === 12 && pulseEffect ?
+                  '0 0 15px rgba(255, 30, 60, 1), 0 0 25px rgba(255, 30, 60, 0.8)' :
+                  hour === 12 ? 
+                  ['0 0 10px rgba(255, 30, 60, 0.8)', '0 0 15px rgba(255, 30, 60, 1)', '0 0 10px rgba(255, 30, 60, 0.8)'] :
+                  '0 0 5px rgba(255, 255, 255, 0.3)'
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              {hour}
+            </motion.div>
+          ) : null;
+        })}
+        
+        {/* Hour ticks - longer marks at each hour */}
+        {[...Array(12)].map((_, index) => {
+          const hour = index === 0 ? 12 : index;
+          const isMainHour = hour === 12 || hour === 3 || hour === 6 || hour === 9;
+          if (isMainHour) return null; // Skip where we have numbers
+          
+          const angle = index * 30;
+          const radians = (angle - 90) * (Math.PI / 180);
+          const outerRadius = 46; // Percentage of clock radius
+          const innerRadius = 43; // Where the tick ends
+          const outerX = 50 + outerRadius * Math.cos(radians);
+          const outerY = 50 + outerRadius * Math.sin(radians);
+          const innerX = 50 + innerRadius * Math.cos(radians);
+          const innerY = 50 + innerRadius * Math.sin(radians);
+          
+          return (
+            <motion.div
+              key={`tick-${index}`}
+              className="absolute bg-gray-400 z-20"
+              style={{
+                width: '2px',
+                height: '2.5%',
+                left: `${outerX}%`,
+                top: `${outerY}%`,
+                transformOrigin: 'center',
+                transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                backgroundColor: hour === 12 ? 'rgba(255,50,50,0.9)' : 'rgba(200,200,200,0.7)'
               }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.6 }}
-              transition={{ delay: index * 0.01 + 0.5 }}
+              animate={{ opacity: 0.8 }}
+              transition={{ delay: index * 0.02 }}
             />
           );
         })}
         
-        {/* Center dot with pulsing effect */}
-        <motion.div 
-          className="absolute w-5 h-5 bg-neon-red rounded-full z-10"
-          animate={{ boxShadow: ['0 0 8px rgba(255, 7, 58, 0.7)', '0 0 16px rgba(255, 7, 58, 0.9)', '0 0 8px rgba(255, 7, 58, 0.7)'] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        />
+        {/* Minute ticks - shorter marks */}
+        {[...Array(60)].map((_, index) => {
+          // Skip positions where hour ticks are
+          if (index % 5 === 0) return null;
+          
+          const angle = index * 6;
+          const radians = (angle - 90) * (Math.PI / 180);
+          const outerRadius = 46; // Percentage of clock radius
+          const innerRadius = 44.5; // Where the tick ends
+          const outerX = 50 + outerRadius * Math.cos(radians);
+          const outerY = 50 + outerRadius * Math.sin(radians);
+          
+          return (
+            <motion.div
+              key={`min-${index}`}
+              className="absolute bg-gray-500 z-20"
+              style={{
+                width: '1px',
+                height: '1%',
+                left: `${outerX}%`,
+                top: `${outerY}%`,
+                transformOrigin: 'center',
+                transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                opacity: 0.5
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              transition={{ delay: 0.8 + index * 0.005 }}
+            />
+          );
+        })}
         
-        {/* Clock hour hand */}
-        <motion.div 
-          className="absolute w-1 h-22 bg-gray-400 origin-bottom transform -translate-x-1/2 -rotate-90"
-          style={{
-            bottom: '50%',
-            left: '50%',
-            zIndex: 5
-          }}
-          initial={{ opacity: 0, rotateZ: -90 }}
-          animate={{ opacity: 0.8, rotateZ: -90 }}
-          transition={{ delay: 0.2 }}
-        />
+        {/* Sunburst pattern in center - as seen in screenshot */}
+        <div className="absolute w-[30%] h-[30%] left-[35%] top-[35%] z-25">
+          {/* Generate sunburst rays */}
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={`ray-${i}`}
+              className="absolute w-[7%] h-[40%] bg-orange-400 opacity-80 rounded-sm"
+              style={{
+                left: '50%',
+                top: '50%',
+                transformOrigin: 'bottom center',
+                transform: `translate(-50%, -100%) rotate(${i * 30}deg)`,
+              }}
+              animate={{ opacity: [0.7, 0.9, 0.7] }}
+              transition={{ duration: 3, delay: i * 0.1, repeat: Infinity }}
+            />
+          ))}
+          
+          {/* Add intermediate rays for fuller sunburst */}
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={`ray-sm-${i}`}
+              className="absolute w-[4%] h-[35%] bg-orange-300 opacity-60 rounded-sm"
+              style={{
+                left: '50%',
+                top: '50%',
+                transformOrigin: 'bottom center',
+                transform: `translate(-50%, -100%) rotate(${(i * 30) + 15}deg)`,
+              }}
+              animate={{ opacity: [0.5, 0.7, 0.5] }}
+              transition={{ duration: 2.5, delay: i * 0.1, repeat: Infinity }}
+            />
+          ))}
+        </div>
         
-        {/* Clock minute hand (Doomsday minute hand) */}
-        <motion.div 
-          ref={clockRef}
-          className="absolute w-1.5 h-34 bg-neon-red origin-bottom shadow-clock-glow z-20"
+        {/* Hour hand - styled for a professional look */}
+        <motion.div
+          className="absolute z-40"
           style={{
+            width: '2.5%',
+            height: '25%',
+            backgroundColor: 'rgba(220, 220, 240, 0.9)',
             bottom: '50%',
-            left: '50%',
+            left: '49%',
+            transformOrigin: 'bottom center',
+            borderRadius: '25% 25% 0 0',
+            boxShadow: '0 0 3px rgba(255, 255, 255, 0.5)'
           }}
-          initial={{ opacity: 0, rotateZ: -180 }}
+          initial={{ opacity: 0, rotate: 0 }}
           animate={{ 
             opacity: 1, 
-            rotateZ: getHandRotation(minutesToMidnight) - 90 // properly offset for CSS rotation
+            rotate: getHourHandRotation()
           }}
           transition={{ 
             type: 'spring',
             stiffness: 50,
             damping: 15,
-            delay: 0.5
+            delay: 0.3
           }}
         />
         
-        {/* Midnight marker - glowing 12 */}
+        {/* Minute hand - main Doomsday indicator hand */}
         <motion.div 
-          className="absolute top-6 left-1/2 transform -translate-x-1/2 font-bold text-xl text-neon-red"
-          style={{ textShadow: '0 0 10px rgba(255, 7, 58, 0.9), 0 0 20px rgba(255, 7, 58, 0.5)' }}
-          animate={{ textShadow: ['0 0 10px rgba(255, 7, 58, 0.9)', '0 0 15px rgba(255, 7, 58, 1), 0 0 25px rgba(255, 7, 58, 0.8)', '0 0 10px rgba(255, 7, 58, 0.9)'] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        >
-          12
-        </motion.div>
+          ref={minuteHandRef}
+          className="absolute z-40"
+          style={{
+            width: '2%',
+            height: '36%',
+            backgroundColor: 'rgba(255, 40, 60, 0.9)',
+            bottom: '50%',
+            left: '49.2%',
+            transformOrigin: 'bottom center',
+            borderRadius: '25% 25% 0 0',
+            boxShadow: pulseEffect 
+              ? '0 0 8px rgba(255, 30, 50, 0.8)'
+              : '0 0 5px rgba(255, 30, 50, 0.6)'
+          }}
+          initial={{ opacity: 0, rotate: -180 }}
+          animate={{ 
+            opacity: 1, 
+            rotate: getHandRotation(secondsToMidnight)
+          }}
+          transition={{ 
+            type: 'spring',
+            stiffness: 50,
+            damping: 15,
+            delay: 0.4
+          }}
+        />
         
-        {/* Clock numbers */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-gray-300 font-bold">6</div>
-        <div className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-300 font-bold">3</div>
-        <div className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-300 font-bold">9</div>
+        {/* Second hand - very thin */}
+        <motion.div 
+          className="absolute z-40"
+          style={{
+            width: '1px',
+            height: '42%',
+            backgroundColor: 'rgba(255, 50, 50, 0.7)',
+            bottom: '50%',
+            left: '50%',
+            transformOrigin: 'bottom center',
+            boxShadow: '0 0 2px rgba(255, 0, 0, 0.5)'
+          }}
+          initial={{ opacity: 0, rotate: 0 }}
+          animate={{ 
+            opacity: 0.8, 
+            rotate: currentSeconds * 6 - 90 // Convert seconds to degrees
+          }}
+          transition={{ type: 'tween' }}
+        />
+        
+        {/* Center dot with bright red glow - matches the screenshot */}
+        <motion.div
+          className="absolute rounded-full z-50"
+          style={{ 
+            width: '7%',
+            height: '7%',
+            top: '46.5%',
+            left: '46.5%',
+            background: 'radial-gradient(circle, rgba(255,60,60,1) 0%, rgba(230,30,30,1) 90%)',
+            boxShadow: '0 0 15px rgba(255, 30, 30, 0.9), 0 0 30px rgba(255, 0, 0, 0.5)'
+          }}
+          animate={{ 
+            boxShadow: pulseEffect 
+              ? '0 0 20px rgba(255, 30, 30, 1), 0 0 40px rgba(255, 0, 0, 0.7)'
+              : '0 0 15px rgba(255, 30, 30, 0.9), 0 0 30px rgba(255, 0, 0, 0.5)'
+          }}
+          transition={{ duration: pulseEffect ? 0.3 : 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
       </motion.div>
       
-      {/* Digital readout */}
+      {/* Digital readout styled after the screenshot */}
       <motion.div 
-        className="text-center mb-6 bg-darkest py-4 px-6 rounded-lg border border-gray-800 w-full max-w-md"
-        style={{ boxShadow: '0 0 20px rgba(0, 0, 0, 0.4)' }}
+        className="text-center mb-6 bg-black border border-gray-900 w-full max-w-md py-6 px-8 rounded-xl"
+        style={{ 
+          boxShadow: '0 0 30px rgba(0, 0, 0, 0.7)',
+          background: 'linear-gradient(180deg, rgba(10,10,15,1) 0%, rgba(0,0,0,1) 100%)'
+        }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
       >
-        <h2 className="text-3xl md:text-4xl font-bold text-neon-red mb-1 animate-glow-pulse">
-          <span className="tabular-nums">{digitalSeconds - (secondsCounter % Math.min(digitalSeconds, 60))}</span> <span className="text-2xl">Seconds</span>
-        </h2>
-        <p className="text-xl font-medium text-neon-yellow mb-3">to Midnight</p>
-        <p className="text-sm text-gray-400">
-          Set by the <span className="text-white">Bulletin of Atomic Scientists</span>: {formatLastUpdated(lastUpdated)}
-        </p>
-      </motion.div>
-      
-      {/* Statement box */}
-      <motion.div 
-        className="mb-6 text-center bg-opacity-20 bg-gray-800 p-4 rounded-md max-w-2xl"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-      >
-        <p className="italic text-gray-300">"{statement}"</p>
+        <div className="flex flex-col items-center justify-center">
+          {/* Big bold seconds counter */}
+          <motion.div className="flex items-end justify-center w-full mb-2">
+            <motion.span
+              className="text-6xl md:text-7xl font-bold tracking-tighter"
+              style={{ 
+                color: '#f02',
+                textShadow: pulseEffect ? 
+                  '0 0 25px rgba(255, 0, 30, 0.9), 0 0 40px rgba(255, 0, 30, 0.6)' : 
+                  '0 0 20px rgba(255, 0, 30, 0.8), 0 0 30px rgba(255, 0, 30, 0.5)'
+              }}
+              animate={{ 
+                textShadow: [
+                  '0 0 20px rgba(255, 0, 30, 0.8), 0 0 30px rgba(255, 0, 30, 0.5)', 
+                  '0 0 25px rgba(255, 0, 30, 0.9), 0 0 40px rgba(255, 0, 30, 0.6)', 
+                  '0 0 20px rgba(255, 0, 30, 0.8), 0 0 30px rgba(255, 0, 30, 0.5)'
+                ]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.span 
+                  key={displaySeconds}
+                  className="tabular-nums"
+                  initial={{ opacity: 0.8, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                >
+                  {displaySeconds}
+                </motion.span>
+              </AnimatePresence>
+            </motion.span>
+            
+            <motion.span 
+              className="text-3xl md:text-4xl font-bold ml-3 mb-1"
+              style={{ 
+                color: '#f02',
+                textShadow: '0 0 15px rgba(255, 0, 30, 0.7), 0 0 25px rgba(255, 0, 30, 0.4)'
+              }}
+            >
+              Seconds
+            </motion.span>
+          </motion.div>
+          
+          {/* To Midnight text in yellow */}
+          <motion.p 
+            className="text-2xl md:text-3xl font-bold mb-5"
+            style={{ 
+              color: '#ff3',
+              textShadow: '0 0 10px rgba(255, 255, 50, 0.7), 0 0 20px rgba(255, 255, 50, 0.4)'
+            }}
+          >
+            to Midnight
+          </motion.p>
+          
+          {/* Source line with clean styling */}
+          <div className="flex items-center justify-center text-white/80">
+            <p className="text-sm">
+              Set by the <span className="font-bold">Bulletin of Atomic Scientists</span>: 
+              <span className="text-white/70">{formatLastUpdated(lastUpdated)}</span>
+            </p>
+          </div>
+        </div>
       </motion.div>
       
       {/* Learn More button */}
