@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   const signInWithX = async () => {
     try {
       setError(null);
+      console.log("Starting Twitter authentication process");
       
       // Use mock user in development mode if Firebase is not configured
       if (isDevelopment) {
@@ -44,16 +45,31 @@ export const AuthProvider = ({ children }) => {
         
         // Simulate auth state change
         setCurrentUser(mockUser);
+        console.log("Mock authentication successful");
         return { user: mockUser };
       }
       
       // Real authentication in production
+      console.log("Attempting Twitter popup authentication");
       const result = await signInWithPopup(auth, twitterProvider);
+      console.log("Twitter authentication successful", result);
+      
+      // Immediately set the user to avoid race conditions with the auth state observer
+      setCurrentUser(result.user);
+      
       // Return the user credential
       return result;
     } catch (error) {
       console.error("Error signing in with X:", error);
-      setError(error.message);
+      // More detailed error logging
+      if (error.code) {
+        console.error(`Error code: ${error.code}`);
+      }
+      if (error.customData) {
+        console.error("Error custom data:", error.customData);
+      }
+      
+      setError(error.message || "Authentication failed");
       return null;
     }
   };

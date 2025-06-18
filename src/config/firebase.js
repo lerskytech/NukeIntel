@@ -24,7 +24,17 @@ console.log("Firebase initialized in", isDevelopment ? "DEVELOPMENT" : "PRODUCTI
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Configure Twitter provider with proper callback handling
 const twitterProvider = new TwitterAuthProvider();
+// Add custom parameters to ensure correct callback handling
+twitterProvider.setCustomParameters({
+  'allow_signup': 'true',
+  'lang': 'en'
+});
+
+// Log authentication initialization to help debug
+console.log("Twitter authentication provider initialized");
 
 // Export Firebase services
 export { auth, db, twitterProvider, isDevelopment };

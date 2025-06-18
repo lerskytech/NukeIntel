@@ -100,9 +100,31 @@ const NukeIntelBlog = () => {
     }
   };
 
-  // Handle sign in
+  // Handle sign in with better error handling
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [signInError, setSignInError] = useState(null);
+
+  // Handle Twitter sign in with proper error handling
   const handleSignIn = async () => {
-    await signInWithX();
+    try {
+      setIsSigningIn(true);
+      setSignInError(null);
+      
+      console.log("NukeIntelBlog: Starting Twitter sign-in process");
+      const result = await signInWithX();
+      
+      if (!result) {
+        console.warn("NukeIntelBlog: Sign-in returned no result");
+        setSignInError("Authentication failed. Please try again.");
+      } else {
+        console.log("NukeIntelBlog: Sign-in successful");
+      }
+    } catch (error) {
+      console.error("NukeIntelBlog: Error during sign-in:", error);
+      setSignInError(error.message || "Failed to sign in. Please try again.");
+    } finally {
+      setIsSigningIn(false);
+    }
   };
 
   return (
@@ -246,12 +268,28 @@ const NukeIntelBlog = () => {
             <h3 className="text-white font-medium mb-2">Join the #NukeIntel Community</h3>
             <p className="text-gray-400 text-sm mb-4">Sign in to share your insights and contribute to the global security conversation</p>
             
+            {signInError && (
+              <div className="mb-3 p-2 bg-red-900 bg-opacity-30 border border-red-800 rounded-md text-red-300 text-sm">
+                {signInError}
+              </div>
+            )}
+            
             <button
               onClick={handleSignIn}
-              className="flex items-center mx-auto space-x-2 bg-neon-blue hover:bg-blue-600 text-white rounded-md px-4 py-2 transition-colors"
+              disabled={isSigningIn}
+              className={`flex items-center justify-center mx-auto space-x-2 ${isSigningIn ? 'bg-blue-800' : 'bg-neon-blue hover:bg-blue-600'} text-white rounded-md px-4 py-2 transition-colors w-48`}
             >
-              <FiTwitter className="text-white" size={18} />
-              <span>Sign in with X</span>
+              {isSigningIn ? (
+                <>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <FiTwitter className="text-white mr-2" size={18} />
+                  <span>Sign in with X</span>
+                </>
+              )}
             </button>
           </div>
         )}

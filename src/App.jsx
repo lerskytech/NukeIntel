@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Component } from 'react'
 import { Helmet } from 'react-helmet'
 import { motion } from 'framer-motion'
 import Header from './components/Header'
@@ -6,6 +6,43 @@ import DoomsdayClock from './components/DoomsdayClock'
 import NewsWidget from './components/NewsWidget'
 import SocialIntelPanel from './components/SocialIntelPanel'
 import Footer from './components/Footer'
+
+// Error Boundary Component to catch rendering errors
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    // Update state so the next render shows the fallback UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Log error information
+    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    this.setState({ error, errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Custom fallback UI
+      return (
+        <div style={{ padding: '20px', backgroundColor: '#111', color: 'white', minHeight: '100vh' }}>
+          <h2>Something went wrong.</h2>
+          <details style={{ whiteSpace: 'pre-wrap', marginTop: '20px' }}>
+            <summary>Error Details</summary>
+            <p>{this.state.error && this.state.error.toString()}</p>
+            <p>{this.state.errorInfo && this.state.errorInfo.componentStack}</p>
+          </details>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Configuration moved to main.jsx
 
@@ -51,7 +88,9 @@ function App() {
           
           <NewsWidget />
           
-          <SocialIntelPanel />
+          <ErrorBoundary>
+            <SocialIntelPanel />
+          </ErrorBoundary>
         </motion.main>
         
         <Footer />
