@@ -4,7 +4,7 @@ import {
   signOut, 
   onAuthStateChanged 
 } from "firebase/auth";
-import { auth, twitterProvider } from '../config/firebase';
+import { auth, twitterProvider, isDevelopment } from '../config/firebase';
 
 // Create auth context
 const AuthContext = createContext();
@@ -19,6 +19,35 @@ export const AuthProvider = ({ children }) => {
   const signInWithX = async () => {
     try {
       setError(null);
+      
+      // Use mock user in development mode if Firebase is not configured
+      if (isDevelopment) {
+        console.log("Using mock Twitter authentication in development mode");
+        const mockUser = {
+          uid: "mock-user-123",
+          displayName: "Demo User",
+          email: "demo@example.com",
+          photoURL: "https://via.placeholder.com/150",
+          reloadUserInfo: {
+            screenName: "nukeintelfan"
+          },
+          providerData: [
+            {
+              providerId: "twitter.com",
+              uid: "mock-twitter-123",
+              displayName: "Demo User",
+              photoURL: "https://via.placeholder.com/150",
+              email: "demo@example.com"
+            }
+          ]
+        };
+        
+        // Simulate auth state change
+        setCurrentUser(mockUser);
+        return { user: mockUser };
+      }
+      
+      // Real authentication in production
       const result = await signInWithPopup(auth, twitterProvider);
       // Return the user credential
       return result;

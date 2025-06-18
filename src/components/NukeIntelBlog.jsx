@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiEdit, FiMessageSquare, FiSend, FiUser, FiUsers, FiTwitter, FiLogIn } from 'react-icons/fi';
+import { FiEdit, FiMessageSquare, FiSend, FiUser, FiUsers, FiTwitter, FiLogIn, FiAlertCircle } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
+import { fetchFeaturedNukeIntelPosts, createNukeIntelPost, fetchUserPosts } from '../services/twitterService';
 
 /**
  * NukeIntelBlog - Component for creating and displaying #NukeIntel blog posts
  * Integrates with Twitter/X and allows users to create posts that appear on both platforms
+ * Now fetches real tweets from @nukeintelnews with the #NukeIntel tag
  */
 const NukeIntelBlog = () => {
   const { currentUser, signInWithX } = useAuth();
@@ -14,49 +16,45 @@ const NukeIntelBlog = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [featuredPosts, setFeaturedPosts] = useState([]);
 
-  // Sample featured posts from high-follower accounts (in a real app, these would come from an API)
+  // Load featured posts from Twitter service
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch featured posts from high-follower accounts with #NukeIntel tag
   useEffect(() => {
-    // Simulated API response for featured posts from accounts with high follower counts
-    const getFeaturedPosts = async () => {
-      // In production, this would be an API call to get posts meeting follower criteria
-      const sampleFeaturedPosts = [
-        {
-          id: '1',
-          author: 'Nuclear Security Expert',
-          handle: 'NuclearExpert',
-          content: 'New research indicates significant progress in nuclear non-proliferation efforts across Southeast Asia. #NukeIntel',
-          timestamp: '2025-06-16T15:30:00Z',
-          profileImage: 'https://i.pravatar.cc/150?img=1',
-          followers: 56800,
-          verified: true
-        },
-        {
-          id: '2',
-          author: 'Global Security Institute',
-          handle: 'GlobalSecInst',
-          content: 'Our latest report on nuclear disarmament has been published. Download it here: globalsecinst.org/report2025 #NukeIntel #DoomsdayClock',
-          timestamp: '2025-06-15T12:15:00Z',
-          profileImage: 'https://i.pravatar.cc/150?img=2',
-          followers: 124000,
-          verified: true
-        },
-        {
-          id: '3',
-          author: 'Arms Control Today',
-          handle: 'ArmsControlNow',
-          content: 'Breaking: UN Security Council approves new resolution on nuclear weapons monitoring protocols. This represents a significant step forward. #NukeIntel',
-          timestamp: '2025-06-17T09:45:00Z',
-          profileImage: 'https://i.pravatar.cc/150?img=3',
-          followers: 82300,
-          verified: true
-        }
-      ];
-      
-      setFeaturedPosts(sampleFeaturedPosts);
+    const loadFeaturedPosts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        // Fetch real posts from Twitter service - minimum 50k followers
+        const posts = await fetchFeaturedNukeIntelPosts(50000, 5);
+        setFeaturedPosts(posts);
+      } catch (err) {
+        console.error('Error loading featured posts:', err);
+        setError('Unable to load featured posts. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
     };
     
-    getFeaturedPosts();
+    loadFeaturedPosts();
   }, []);
+  
+  // Fetch user's posts when logged in
+  useEffect(() => {
+    const loadUserPosts = async () => {
+      if (currentUser) {
+        try {
+          const userPosts = await fetchUserPosts(currentUser.uid);
+          setPosts(userPosts);
+        } catch (err) {
+          console.error('Error loading user posts:', err);
+        }
+      }
+    };
+    
+    loadUserPosts();
+  }, [currentUser]);
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -65,36 +63,41 @@ const NukeIntelBlog = () => {
   };
 
   // Handle post submission
-  const handleSubmitPost = () => {
+  const handleSubmitPost = async () => {
     if (!newPostContent.trim() || !currentUser) return;
     
     setIsSubmitting(true);
     
-    // Create the new post object
-    const newPost = {
-      id: `local-${Date.now()}`,
-      author: currentUser.displayName || 'User',
-      handle: currentUser.reloadUserInfo?.screenName || 'user',
-      content: newPostContent,
-      timestamp: new Date().toISOString(),
-      profileImage: currentUser.photoURL || null,
-      followers: 0,
-      local: true
-    };
-    
-    // Add hashtag if not present
-    if (!newPostContent.includes('#NukeIntel')) {
-      newPost.content += ' #NukeIntel';
+    try {
+      // Create the new post object
+      const postContent = newPostContent.includes('#NukeIntel') 
+        ? newPostContent 
+        : `${newPostContent} #NukeIntel`;
+      
+      const newPost = {
+        author: currentUser.displayName || 'User',
+        handle: currentUser.reloadUserInfo?.screenName || 'user',
+        content: postContent,
+        userId: currentUser.uid,
+        profileImage: currentUser.photoURL || null,
+        followers: 0,
+        verified: false
+      };
+      
+      // Save to backend via Twitter service
+      const savedPost = await createNukeIntelPost(newPost);
+      
+      // Add post to local state
+      setPosts([savedPost, ...posts]);
+      
+      // Reset form
+      setNewPostContent('');
+    } catch (error) {
+      console.error('Error creating post:', error);
+      alert('Failed to create post. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    // Add post to local state
-    setPosts([newPost, ...posts]);
-    
-    // Reset form
-    setNewPostContent('');
-    setIsSubmitting(false);
-    
-    // In a real app, here we would also post to Twitter API and/or save to backend
   };
 
   // Handle sign in
@@ -111,65 +114,84 @@ const NukeIntelBlog = () => {
       transition={{ duration: 0.5 }}
     >
       {/* Header */}
-      <div className="px-5 py-4 border-b border-gray-800 flex justify-between items-center bg-midnight">
+      <div className="px-4 py-3 border-b border-gray-800 flex justify-between items-center">
         <div className="flex items-center">
-          <span className="text-xl font-bold text-neon-blue mr-2">#NukeIntel</span>
-          <span className="text-gray-400 text-sm">Blog</span>
+          <FiTwitter className="text-neon-blue mr-2" size={18} />
+          <h2 className="text-white font-medium">#NukeIntel Blog</h2>
         </div>
       </div>
       
-      {/* Featured posts section (visible to all users) */}
+      {/* Featured posts */}
       <div className="p-4 border-b border-gray-800">
         <div className="flex items-center mb-3">
           <FiUsers className="text-neon-blue mr-2" />
-          <h3 className="text-sm font-medium text-gray-300">FEATURED POSTS</h3>
+          <h3 className="text-sm font-medium text-gray-300">FEATURED #NUKEINTEL INSIGHTS</h3>
         </div>
         
-        <div className="space-y-4">
-          {featuredPosts.map(post => (
-            <motion.div
-              key={post.id}
-              className="p-4 rounded-lg bg-gray-800 bg-opacity-30 border border-gray-700"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="flex items-center mb-2">
-                {post.profileImage ? (
-                  <img
-                    src={post.profileImage}
-                    alt={post.author}
-                    className="w-10 h-10 rounded-full mr-3"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-3">
-                    <FiUser className="text-gray-300" />
-                  </div>
-                )}
-                <div>
-                  <div className="flex items-center">
-                    <span className="font-medium text-white">{post.author}</span>
-                    {post.verified && (
-                      <svg className="w-4 h-4 text-neon-blue ml-1" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-400">
-                    <span>@{post.handle}</span>
-                    <span className="mx-1">•</span>
-                    <span>{formatDate(post.timestamp)}</span>
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse"></div>
+              <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse delay-150"></div>
+              <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse delay-300"></div>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="text-center p-6 bg-gray-800 bg-opacity-30 rounded-lg">
+            <FiAlertCircle size={24} className="mx-auto mb-3 text-gray-500" />
+            <p className="text-gray-400">{error}</p>
+          </div>
+        ) : featuredPosts.length > 0 ? (
+          <div className="space-y-4 mb-6">
+            {featuredPosts.map(post => (
+              <motion.div
+                key={post.id}
+                className="p-4 rounded-lg bg-gray-800 bg-opacity-30 border border-gray-700"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center mb-2">
+                  {post.profileImage ? (
+                    <img
+                      src={post.profileImage}
+                      alt={post.author}
+                      className="w-10 h-10 rounded-full mr-3"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-3">
+                      <FiUser className="text-gray-300" />
+                    </div>
+                  )}
+                  <div>
+                    <div className="flex items-center">
+                      <span className="font-medium text-white">{post.author}</span>
+                      {post.verified && (
+                        <svg className="w-4 h-4 text-neon-blue ml-1" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-400">
+                      <span>@{post.handle}</span>
+                      <span className="mx-1">•</span>
+                      <span>{formatDate(post.timestamp)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="text-white mb-2">{post.content}</div>
-              <div className="text-sm text-gray-400 flex items-center">
-                <FiUsers className="mr-1" />
-                <span>{post.followers.toLocaleString()} followers</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                <div className="text-white mb-2">{post.content}</div>
+                <div className="text-sm text-gray-400 flex items-center">
+                  <FiUsers className="mr-1" />
+                  <span>{post.followers.toLocaleString()} followers</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center p-6 bg-gray-800 bg-opacity-30 rounded-lg">
+            <p className="text-gray-400">No featured posts available at this time.</p>
+          </div>
+        )}
       </div>
       
       {/* Post creation form (for signed in users) */}

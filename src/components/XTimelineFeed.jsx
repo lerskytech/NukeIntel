@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { FiRefreshCw, FiMessageSquare, FiHash, FiFilter, FiUsers } from 'react-icons/fi';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiTwitter, FiRefreshCw, FiFilter, FiMessageSquare, FiAlertCircle } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
- * XTimelineFeed - Component to display X/Twitter timeline for specific hashtag or search
+ * XTimelineFeed - Embeds Twitter timeline for @nukeintelnews and #NukeIntel tagged posts
  * Embeds tweets related to nuclear security, global threats, and the #NukeIntel tag
  * Now showing high-follower posts for all users regardless of login state
  */
@@ -16,6 +16,21 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
   const [timelineLoaded, setTimelineLoaded] = useState(false);
   const [filterByFollowers, setFilterByFollowers] = useState(true); // Default to showing high-follower tweets
 
+  // Function to refresh the timeline when filter settings change
+  const refreshTimeline = () => {
+    if (window.twttr && timelineContainerRef.current) {
+      // This will trigger the useEffect that loads the timeline
+      timelineContainerRef.current.innerHTML = '';
+      setTimelineLoaded(false);
+      setIsLoading(true);
+      
+      // Force re-render of the timeline
+      const currentKeyword = selectedKeyword;
+      setSelectedKeyword('');
+      setTimeout(() => setSelectedKeyword(currentKeyword), 10);
+    }
+  };
+  
   // Function to load Twitter widgets
   const loadTwitterWidgetsScript = () => {
     // Remove any existing script first
@@ -54,30 +69,36 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
   // Load timeline when Twitter widgets are ready or when selectedKeyword changes
   useEffect(() => {
     if (window.twttr && timelineContainerRef.current) {
-      setIsLoading(true);
-
       // Clear previous timeline
-      if (timelineContainerRef.current) {
-        timelineContainerRef.current.innerHTML = '';
-      }
-
-      // Create the search query
-      // Add filter for min_faves to prioritize tweets with higher engagement
-      // Format: nuclear OR "global security" OR doomsdayclock OR "atomic scientists"
-      const searchQuery = selectedKeyword || keywords[0] || 'NukeIntel';
+      timelineContainerRef.current.innerHTML = '';
       
-      // Add filter for high-follower accounts and engagement
-      let searchString = `#${searchQuery} OR ${searchQuery}`;
-      if (filterByFollowers) {
-        searchString += ` min_faves:25`; // Add minimum favorites filter
-      }
+      // Show loading state
+      setIsLoading(true);
       
-      // Create Twitter timeline
-      window.twttr.widgets.createTimeline(
-        {
+      // Define search options based on selected keyword and filter settings
+      let searchConfig;
+      
+      // If default NukeIntel keyword, prioritize @nukeintelnews tweets
+      if (selectedKeyword === 'NukeIntel') {
+        searchConfig = {
+          sourceType: 'profile',
+          screenName: 'nukeintelnews'
+        };
+      } else {
+        // Otherwise search by keyword/hashtag with engagement filtering
+        let searchString = `#${selectedKeyword} OR ${selectedKeyword}`;
+        if (filterByFollowers) {
+          searchString += ` min_faves:25`;
+        }
+        
+        searchConfig = {
           sourceType: 'search',
           search: searchString,
-        },
+        };
+      }
+      
+      window.twttr.widgets.createTimeline(
+        searchConfig,
         timelineContainerRef.current,
         {
           height: 400,
@@ -104,6 +125,16 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
     ...keywords.filter(k => !['NukeIntel', 'DoomsdayClock', 'NuclearSecurity'].includes(k))
   ].slice(0, 6); // Limit to 6 options
 
+  // Filter options
+  const toggleFollowerFilter = () => {
+    setFilterByFollowers(!filterByFollowers);
+    // Force refresh the timeline with new filter
+    refreshTimeline();
+  };
+  
+  // Determine if we're showing the @nukeintelnews profile or a hashtag search
+  const isShowingProfile = selectedKeyword === 'NukeIntel';
+
   return (
     <motion.div
       className="bg-gray-900 bg-opacity-30 border border-gray-800 rounded-lg"
@@ -119,7 +150,7 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
           
           {/* Follower filter toggle */}
           <button 
-            onClick={() => setFilterByFollowers(!filterByFollowers)}
+            onClick={toggleFollowerFilter}
             className={`ml-3 flex items-center text-xs px-2 py-1 rounded ${filterByFollowers ? 'bg-neon-blue bg-opacity-20 text-neon-blue' : 'bg-gray-800 text-gray-400'}`}
             title="Show popular tweets from accounts with higher follower counts"
           >
@@ -182,8 +213,12 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
         {!isLoading && !timelineLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
             <div className="text-center p-4">
-              <FiMessageSquare size={24} className="mx-auto mb-3 text-gray-500" />
-              <p className="text-gray-400">No tweets found for #{selectedKeyword}</p>
+              <FiAlertCircle size={24} className="mx-auto mb-3 text-gray-500" />
+              <p className="text-gray-400">
+                {isShowingProfile 
+                  ? 'No tweets found from @nukeintelnews' 
+                  : `No tweets found for #${selectedKeyword}`}
+              </p>
               <p className="text-sm text-gray-500 mt-2">Try another hashtag or check back later</p>
             </div>
           </div>
