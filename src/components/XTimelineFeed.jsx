@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiRefreshCw, FiMessageSquare, FiHash } from 'react-icons/fi';
+import { FiRefreshCw, FiMessageSquare, FiHash, FiFilter, FiUsers } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
  * XTimelineFeed - Component to display X/Twitter timeline for specific hashtag or search
  * Embeds tweets related to nuclear security, global threats, and the #NukeIntel tag
+ * Now showing high-follower posts for all users regardless of login state
  */
 const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
   const { currentUser } = useAuth();
@@ -13,6 +14,7 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
   const [selectedKeyword, setSelectedKeyword] = useState(defaultKeyword);
   const [isLoading, setIsLoading] = useState(true);
   const [timelineLoaded, setTimelineLoaded] = useState(false);
+  const [filterByFollowers, setFilterByFollowers] = useState(true); // Default to showing high-follower tweets
 
   // Function to load Twitter widgets
   const loadTwitterWidgetsScript = () => {
@@ -60,14 +62,21 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
       }
 
       // Create the search query
+      // Add filter for min_faves to prioritize tweets with higher engagement
       // Format: nuclear OR "global security" OR doomsdayclock OR "atomic scientists"
       const searchQuery = selectedKeyword || keywords[0] || 'NukeIntel';
+      
+      // Add filter for high-follower accounts and engagement
+      let searchString = `#${searchQuery} OR ${searchQuery}`;
+      if (filterByFollowers) {
+        searchString += ` min_faves:25`; // Add minimum favorites filter
+      }
       
       // Create Twitter timeline
       window.twttr.widgets.createTimeline(
         {
           sourceType: 'search',
-          search: `#${searchQuery} OR ${searchQuery}`,
+          search: searchString,
         },
         timelineContainerRef.current,
         {
@@ -102,11 +111,21 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Hashtag selector */}
+      {/* Hashtag selector with follower filter option */}
       <div className="p-3 border-b border-gray-800 flex items-center justify-between">
         <div className="flex items-center text-neon-blue">
           <FiHash size={16} className="mr-1" />
           <span className="font-medium text-sm">Timeline</span>
+          
+          {/* Follower filter toggle */}
+          <button 
+            onClick={() => setFilterByFollowers(!filterByFollowers)}
+            className={`ml-3 flex items-center text-xs px-2 py-1 rounded ${filterByFollowers ? 'bg-neon-blue bg-opacity-20 text-neon-blue' : 'bg-gray-800 text-gray-400'}`}
+            title="Show popular tweets from accounts with higher follower counts"
+          >
+            <FiUsers size={12} className="mr-1" />
+            <span>Popular posts</span>
+          </button>
         </div>
         
         <button
@@ -170,9 +189,10 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
           </div>
         )}
         
+        {/* Enhanced login message for non-authenticated users */}
         {!currentUser && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 to-transparent p-4 flex flex-col items-center">
-            <p className="text-sm text-gray-300 mb-2">Sign in with X to engage with these conversations</p>
+            <p className="text-sm text-gray-300 mb-2">Sign in with X to join the conversation and post your own updates</p>
             <div className="h-12"></div> {/* Spacer to prevent overlap with content */}
           </div>
         )}
