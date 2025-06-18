@@ -3,8 +3,8 @@ import { Helmet } from 'react-helmet'
 import { motion } from 'framer-motion'
 import Header from './components/Header'
 import DoomsdayClock from './components/DoomsdayClock'
+import LiveStream from './components/LiveStream'
 import NewsWidget from './components/NewsWidget'
-import SocialIntelPanel from './components/SocialIntelPanel'
 import Footer from './components/Footer'
 
 // Error Boundary Component to catch rendering errors
@@ -86,11 +86,12 @@ function App() {
         >
           <DoomsdayClock />
           
-          <NewsWidget />
+          <LiveStream 
+            src="https://www.youtube.com/embed/jQl2c_rr9yg?autoplay=1" 
+            title="Live from Tel Aviv" 
+          />
           
-          <ErrorBoundary>
-            <SocialIntelPanel />
-          </ErrorBoundary>
+          <NewsWidget />
         </motion.main>
         
         <Footer />
