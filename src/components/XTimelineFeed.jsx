@@ -215,7 +215,7 @@ const XTimelineFeed = ({ keywords = [], defaultKeyword = 'NukeIntel' }) => {
             <div className="text-center p-4">
               <FiAlertCircle size={24} className="mx-auto mb-3 text-gray-500" />
               <p className="text-gray-400">
-                {isShowingProfile 
+                {selectedKeyword === 'NukeIntel'
                   ? 'No tweets found from @nukeintelnews' 
                   : `No tweets found for #${selectedKeyword}`}
               </p>
