@@ -11,8 +11,23 @@
     <meta property="og:image" content="/og-clock.png" />
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#0f0f0f" />
+    <!-- Emergency fix for black screen issue -->
+    <style>
+      html, body {
+        background-color: #070707 !important;
+        color: #ffffff !important;
+      }
+      #root {
+        background-color: #070707 !important;
+        min-height: 100vh;
+      }
+      .min-h-screen {
+        min-height: 100vh;
+        background-color: #070707 !important;
+      }
+    </style>
   </head>
-  <body class="bg-darker text-white">
+  <body class="bg-darker text-white" style="background-color: #070707 !important; color: white !important;">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
