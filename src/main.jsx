@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
+import './emergency-styles.css' // Emergency fix for black screen issue
 import { AuthProvider } from './contexts/AuthContext'
 import { QueryClient, QueryClientProvider } from 'react-query'
 

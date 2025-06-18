@@ -19,7 +19,7 @@ function App() {
   }, [])
 
   return (
-      <div className="min-h-screen flex flex-col bg-darkest text-white relative overflow-hidden">
+      <div className="min-h-screen flex flex-col bg-gray-900 text-white relative overflow-hidden" style={{backgroundColor: '#0a0a0a'}}>
         <Helmet>
           <title>NukeIntel - Real-Time Global Threat Tracker</title>
           <meta name="description" content="Track global nuclear threats in real-time and monitor risks including weapons proliferation, climate change, and disruptive technologies." />
