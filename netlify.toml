@@ -1,11 +1,12 @@
-# NukeIntel App Configuration - Updated 2025-06-17
+# NukeIntel App Configuration - Updated 2025-06-19
 [build]
-  command = "npm install --omit=optional --no-package-lock --force && npm run build"
+  command = "npm install --prefer-offline && npm run build"
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "20.12.2"
+  NODE_VERSION = "18.19.0"
   NPM_FLAGS = "--legacy-peer-deps"
+  NPM_VERSION = "10.2.3"
 
 [[redirects]]
   from = "/*"
