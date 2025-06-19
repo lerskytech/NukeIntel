@@ -1,12 +1,13 @@
 # NukeIntel App Configuration - Updated 2025-06-19
 [build]
-  command = "npm install --prefer-offline && npm run build"
+  command = "npm ci --prefer-offline && npm i esbuild@0.25.5 --no-save && npm run build"
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "18.19.0"
+  NODE_VERSION = "18.19.1"
   NPM_FLAGS = "--legacy-peer-deps"
   NPM_VERSION = "10.2.3"
+  ESBUILD_BINARY_PATH = "./node_modules/esbuild/bin/esbuild"
 
 [[redirects]]
   from = "/*"
