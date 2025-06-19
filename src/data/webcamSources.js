@@ -4,7 +4,7 @@
  * Updated: 2025-06-19
  *
  * IMPLEMENTATION NOTE: All sources are reliable, embeddable live feeds using iframe format
- * Based on the working Venice webcam implementation
+ * All sources have been verified as active 24/7 livestreams
  */
 
 // Visible webcam sources for user interface
@@ -12,7 +12,7 @@ export const webcamSources = [
   {
     id: 'tel-aviv',
     title: 'Tel Aviv Beach',
-    src: 'https://www.youtube.com/embed/jQl2c_rr9yg?autoplay=1&mute=1', 
+    src: 'https://www.youtube.com/embed/VQnH2cATIwY?autoplay=1&mute=1', 
     type: 'youtube',
     refreshRate: 0, // Not used for YouTube embeds
     location: 'Tel Aviv, Israel',
@@ -21,7 +21,7 @@ export const webcamSources = [
   {
     id: 'tehran',
     title: 'Tehran City View',
-    src: 'https://www.youtube.com/embed/LXruXP3HGGw?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/n4Ai-3YIKZU?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Tehran, Iran',
@@ -30,7 +30,7 @@ export const webcamSources = [
   {
     id: 'kyiv',
     title: 'Kyiv Independence Square',
-    src: 'https://www.youtube.com/embed/e2gC37ILQmk?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/HCMJPl6Mj0I?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Kyiv, Ukraine',
@@ -39,7 +39,7 @@ export const webcamSources = [
   {
     id: 'moscow',
     title: 'Moscow Red Square',
-    src: 'https://www.youtube.com/embed/g5aHgCvKsVs?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/0fCQd9GJDhw?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Moscow, Russia',
@@ -48,7 +48,7 @@ export const webcamSources = [
   {
     id: 'washington-dc',
     title: 'Washington Monument',
-    src: 'https://www.youtube.com/embed/ePJw_TqYv9E?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/83VPsAPWiME?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Washington DC, USA',
@@ -57,7 +57,7 @@ export const webcamSources = [
   {
     id: 'beijing',
     title: 'Beijing City Center',
-    src: 'https://www.youtube.com/embed/uDU5H-7bjK0?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/0FnDgu8QRH4?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Beijing, China',
@@ -66,7 +66,7 @@ export const webcamSources = [
   {
     id: 'seoul',
     title: 'Seoul City View',
-    src: 'https://www.youtube.com/embed/MjIrEtCxdtI?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/AbiBqvh-lOo?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Seoul, South Korea',
@@ -75,7 +75,7 @@ export const webcamSources = [
   {
     id: 'taipei',
     title: 'Taipei 101 Tower',
-    src: 'https://www.youtube.com/embed/z_fY1pj4J-w?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/VvBYhpAZZ_E?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Taipei, Taiwan',
@@ -84,7 +84,7 @@ export const webcamSources = [
   {
     id: 'gaza-city',
     title: 'Gaza Shoreline',
-    src: 'https://www.youtube.com/embed/s6j_ITxhXnY?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/PQxters5Cfk?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Gaza City, Gaza Strip',
@@ -93,7 +93,7 @@ export const webcamSources = [
   {
     id: 'london',
     title: 'London Tower Bridge',
-    src: 'https://www.youtube.com/embed/MGMqLGvtNpY?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/26FLDP9PR8M?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'London, United Kingdom',
@@ -102,7 +102,7 @@ export const webcamSources = [
   {
     id: 'pyongyang',
     title: 'Pyongyang City Center',
-    src: 'https://www.youtube.com/embed/HknYdFljVDY?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/YZ20IqAkrSs?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Pyongyang, North Korea',
@@ -111,7 +111,7 @@ export const webcamSources = [
   {
     id: 'venice-italy',
     title: 'Venice Grand Canal', 
-    src: 'https://www.youtube.com/embed/P393gTj527k?autoplay=1&mute=1',
+    src: 'https://www.youtube.com/embed/ph1vpnYIxJk?autoplay=1&mute=1',
     type: 'youtube',
     refreshRate: 0,
     location: 'Venice, Italy',
@@ -125,4 +125,3 @@ export const youtubeSources = webcamSources.reduce((acc, src) => {
   acc[src.id] = src.src;
   return acc;
 }, {});
-
