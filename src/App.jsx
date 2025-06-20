@@ -9,6 +9,7 @@ import Footer from './components/Footer'
 import DomainForSale from './components/DomainForSale'
 // Weather panel and HighAlertFeed removed as requested
 import WindyWebcamView from './components/WindyWebcamView'
+import BulletproofWindyWebcams from './components/BulletproofWindyWebcams'
 
 // Error Boundary Component to catch rendering errors
 class ErrorBoundary extends Component {
@@ -128,6 +129,10 @@ function App() {
             </div>
             
             <NewsWidget />
+            
+            <div className="w-full">
+              <BulletproofWindyWebcams />
+            </div>
           </motion.main>
         )}
         
