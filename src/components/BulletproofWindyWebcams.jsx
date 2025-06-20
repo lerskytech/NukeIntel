@@ -41,6 +41,7 @@ function BulletproofWindyWebcams() {
     )
       .then((res) => res.json())
       .then((json) => {
+        console.log("API RESULT FOR WEBCAM:", json);
         if (!json.webcams || !json.webcams[0]) {
           setFeedError(true);
         }
@@ -122,6 +123,11 @@ function WebcamFeed({ data }) {
 
   return (
     <div>
+      <div style={{ marginBottom: 10, color: "#fff", fontSize: 12, opacity: 0.6 }}>
+        <div>Webcam ID: {data.webcamId || data.id}</div>
+        <div>Title: {data.title}</div>
+        <div>Embed URL: {String(embedUrl)}</div>
+      </div>
       <div style={{
         position: "relative", width: "100%", aspectRatio: "16/9", background: "#000", borderRadius: 8, overflow: "hidden"
       }}>
