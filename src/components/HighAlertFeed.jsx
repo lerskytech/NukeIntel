@@ -115,50 +115,70 @@ const HighAlertFeed = () => {
       {/* Error state */}
       {error && !isLoading && (
         <div className="p-4 border border-red-500 rounded-lg bg-gray-900 bg-opacity-50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center text-red-500 mb-2">
-              <FaExclamationTriangle className="mr-2" />
-              <h3 className="font-bold">
-                {error?.response?.status === 401 ? 'API Authentication Error' :
-                 error?.response?.status === 429 ? 'Rate Limit Exceeded' :
-                 error?.message?.includes('timeout') ? 'Connection Timeout' :
-                 error?.message?.includes('Network') ? 'Network Error' :
-                 'Error Loading Webcams'}
-              </h3>
+          <div className="flex items-center justify-center p-10 bg-gray-900 rounded-lg">
+            <div className="flex flex-col items-center">
+              <div className="text-red-500 mb-2">
+                <FaExclamationTriangle size={40} />
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl text-red-500 mb-1">
+                  {error?.response?.status === 401 ? 'API Key Error' :
+                   error?.response?.status === 429 ? 'Rate Limit Exceeded' :
+                   error?.message?.includes('timeout') ? 'Connection Timeout' :
+                   error?.message?.includes('Network') ? 'Network Error' :
+                   'Error Loading Webcams'}
+                </h3>
+              </div>
+              <button 
+                onClick={() => refetch()}
+                className="text-blue-400 hover:text-blue-300 flex items-center text-sm"
+                aria-label="Retry loading webcams"
+              >
+                <span className="mr-1">Retry</span>
+                <FaExclamationTriangle />
+              </button>
             </div>
-            <button 
-              onClick={() => refetch()}
-              className="text-blue-400 hover:text-blue-300 flex items-center text-sm"
-              aria-label="Retry loading webcams"
-            >
-              <span className="mr-1">Retry</span>
-              <FaExclamationTriangle />
-            </button>
+            <p className="text-gray-400 text-sm">
+              {error?.response?.status === 401 ? 'Windy API key invalid or expired' :
+               error?.response?.status === 429 ? 'Too many requests to Windy API, please try again later' :
+               error?.message?.includes('timeout') ? 'The request to Windy API took too long to complete' :
+               error?.message?.includes('Network') ? 'Check your internet connection and try again' :
+               'Unable to load high alert webcam feeds'}
+            </p>
           </div>
-          <p className="text-gray-400 text-sm">
-            {error?.response?.status === 401 ? 'Windy API key invalid or expired' :
-             error?.response?.status === 429 ? 'Too many requests to Windy API, please try again later' :
-             error?.message?.includes('timeout') ? 'The request to Windy API took too long to complete' :
-             error?.message?.includes('Network') ? 'Check your internet connection and try again' :
-             'Unable to load high alert webcam feeds'}
-          </p>
         </div>
       )}
       
       {/* Grid View */}
       {viewMode === 'grid' && !isLoading && !error && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {windyWebcams.map(webcam => (
-            <div key={webcam.id} className="relative">
-              <WindyWebcamPlayer
-                webcamId={webcam.id}
-                city={webcam.city}
-                label={webcam.label}
-                highAlert
-                shareId={webcam.shareId}
-              />
-            </div>
-          ))}
+          {windyWebcams.map(webcam => {
+            const webcamData = webcamsData?.find(data => data.webcamId === webcam.id);
+            const isWebcamUnavailable = !webcamData || webcamData.error;
+            
+            return (
+              <div key={webcam.id} className="relative">
+                {isWebcamUnavailable ? (
+                  <div className="bg-black border border-red-800 rounded-lg p-4 h-full min-h-[200px] flex flex-col items-center justify-center text-center">
+                    <div className="text-red-500 mb-2">
+                      <FaExclamationTriangle size={24} />
+                    </div>
+                    <h3 className="text-red-500 font-bold mb-1">Webcam Unavailable</h3>
+                    <div className="text-xs text-gray-400 mb-2">{webcam.city} - {webcam.label}</div>
+                    <p className="text-sm text-gray-500">Feed unavailable. Monitoring for updates.</p>
+                  </div>
+                ) : (
+                  <WindyWebcamPlayer
+                    webcamId={webcam.id}
+                    city={webcam.city}
+                    label={webcam.label}
+                    highAlert
+                    shareId={webcam.shareId}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
       
@@ -191,13 +211,34 @@ const HighAlertFeed = () => {
             transition={{ duration: 0.3 }}
             className="w-full max-w-3xl mx-auto"
           >
-            <WindyWebcamPlayer
-              webcamId={windyWebcams[activeIndex].id}
-              city={windyWebcams[activeIndex].city}
-              label={windyWebcams[activeIndex].label}
-              highAlert
-              shareId={windyWebcams[activeIndex].shareId}
-            />
+            {(() => {
+              const webcam = windyWebcams[activeIndex];
+              const webcamData = webcamsData?.find(data => data.webcamId === webcam.id);
+              const isWebcamUnavailable = !webcamData || webcamData.error;
+              
+              if (isWebcamUnavailable) {
+                return (
+                  <div className="bg-black border border-red-800 rounded-lg p-4 h-full min-h-[300px] flex flex-col items-center justify-center text-center">
+                    <div className="text-red-500 mb-2">
+                      <FaExclamationTriangle size={32} />
+                    </div>
+                    <h3 className="text-red-500 font-bold text-xl mb-1">Webcam Unavailable</h3>
+                    <div className="text-sm text-gray-400 mb-2">{webcam.city} - {webcam.label}</div>
+                    <p className="text-gray-500">Feed unavailable. Monitoring for updates.</p>
+                  </div>
+                );
+              } else {
+                return (
+                  <WindyWebcamPlayer
+                    webcamId={webcam.id}
+                    city={webcam.city}
+                    label={webcam.label}
+                    highAlert
+                    shareId={webcam.shareId}
+                  />
+                );
+              }
+            })()}
           </motion.div>
           
           {/* Carousel indicator dots */}

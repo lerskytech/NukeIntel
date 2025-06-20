@@ -126,9 +126,8 @@ function App() {
             
             <HighAlertFeed />
             
-            <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="w-full">
               <LiveFeed />
-              {/* Weather panel removed as requested */}
             </div>
             
             <NewsWidget />

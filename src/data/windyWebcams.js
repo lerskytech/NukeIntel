@@ -7,13 +7,24 @@ const webcams = [
   {
     id: '1693844957',
     city: 'Moscow',
-    label: 'Kremlin area',
+    label: 'Khamovniki District (Near Kremlin)',
     location: 'Moscow, Russia',
     description: 'Live view near the Kremlin in Khamovniki District',
     windyUrl: 'https://www.windy.com/-Webcams-Khamovniki-District/webcams/1693844957',
     tags: ['Kremlin', 'Russia', 'High Alert'],
     highAlert: true,
     shareId: 'moscow-kremlin'
+  },
+  {
+    id: '1389696188',
+    city: 'Jerusalem',
+    label: 'City Center',
+    location: 'Jerusalem, Israel',
+    description: 'Live view of Jerusalem city center',
+    windyUrl: 'https://www.windy.com/-Webcams-Jerusalem/webcams/1389696188',
+    tags: ['Jerusalem', 'Israel', 'High Alert'],
+    highAlert: true,
+    shareId: 'jerusalem-center'
   },
   {
     id: '1748254982',
@@ -27,48 +38,26 @@ const webcams = [
     shareId: 'tel-aviv-beach'
   },
   {
-    id: '1578725744',
-    city: 'Tehran',
-    label: 'City View',
-    location: 'Tehran, Iran',
-    description: 'Panoramic view of Tehran cityscape',
-    windyUrl: 'https://www.windy.com/-Webcams-Tehran/webcams/1578725744',
-    tags: ['Tehran', 'Iran', 'High Alert'],
-    highAlert: true,
-    shareId: 'tehran-view'
-  },
-  {
-    id: '1547367347',
-    city: 'Kyiv',
-    label: 'Independence Square',
-    location: 'Kyiv, Ukraine',
-    description: 'Live view of Independence Square (Maidan Nezalezhnosti)',
-    windyUrl: 'https://www.windy.com/-Webcams-Kyiv/webcams/1547367347',
-    tags: ['Kyiv', 'Ukraine', 'High Alert'],
-    highAlert: true,
-    shareId: 'kyiv-maidan'
-  },
-  {
-    id: '1163118294',
-    city: 'Seoul',
-    label: 'City Skyline',
-    location: 'Seoul, South Korea',
-    description: 'Panoramic view of Seoul city center',
-    windyUrl: 'https://www.windy.com/-Webcams-Seoul/webcams/1163118294',
-    tags: ['Seoul', 'South Korea', 'High Alert'],
-    highAlert: true,
-    shareId: 'seoul-skyline'
-  },
-  {
     id: '1744523397',
-    city: 'Pyongyang',
-    label: 'Border View',
-    location: 'Near Pyongyang, North Korea',
-    description: 'Closest available view to Pyongyang from border area',
+    city: 'Jeokseong-myeon',
+    label: 'Near North Korea Border',
+    location: 'Near North Korea border, South Korea',
+    description: 'View from South Korea near the North Korean border',
     windyUrl: 'https://www.windy.com/-Webcams-Jeokseong-myeon/webcams/1744523397',
-    tags: ['Pyongyang', 'North Korea', 'DMZ', 'High Alert'],
+    tags: ['North Korea', 'DMZ', 'High Alert'],
     highAlert: true,
-    shareId: 'pyongyang-view'
+    shareId: 'north-korea-border'
+  },
+  {
+    id: '1166267733',
+    city: 'Hong Kong',
+    label: 'Victoria Harbour',
+    location: 'Hong Kong',
+    description: 'Panoramic view of Victoria Harbour in Hong Kong',
+    windyUrl: 'https://www.windy.com/-Webcams-Hong-Kong/webcams/1166267733',
+    tags: ['Hong Kong', 'China', 'High Alert'],
+    highAlert: true,
+    shareId: 'hong-kong-harbour'
   },
   {
     id: '1596008082',
@@ -76,7 +65,7 @@ const webcams = [
     label: 'Olympic Tower',
     location: 'Beijing, China',
     description: 'View from the Olympic Tower in Beijing',
-    windyUrl: 'https://www.windy.com/-Webcams-Huayuanlu-Subdistrict-%E5%8C%97%E4%BA%AC%E5%A5%A5%E6%9E%97%E5%8C%B9%E5%85%8B%E5%A1%94/webcams/1596008082',
+    windyUrl: 'https://www.windy.com/-Webcams-Huayuanlu-Subdistrict/webcams/1596008082',
     tags: ['Beijing', 'China', 'Olympic', 'High Alert'],
     highAlert: true,
     shareId: 'beijing-olympic'
@@ -106,13 +95,24 @@ const webcams = [
   {
     id: '1568461321',
     city: 'London',
-    label: 'City View',
+    label: 'City Center',
     location: 'London, UK',
     description: 'Panoramic view of central London',
     windyUrl: 'https://www.windy.com/-Webcams-London/webcams/1568461321',
     tags: ['London', 'UK', 'High Alert'],
     highAlert: true,
     shareId: 'london-view'
+  },
+  {
+    id: '1706118429',
+    city: 'Paris',
+    label: 'Palais d\'Iéna',
+    location: 'Paris, France',
+    description: 'View of Paris from Palais d\'Iéna',
+    windyUrl: 'https://www.windy.com/-Webcams-Paris/webcams/1706118429',
+    tags: ['Paris', 'France', 'High Alert'],
+    highAlert: true,
+    shareId: 'paris-iena'
   }
 ];
 
