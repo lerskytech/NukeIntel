@@ -7,8 +7,7 @@ import LiveFeed from './components/LiveFeed'
 import NewsWidget from './components/NewsWidget'
 import Footer from './components/Footer'
 import DomainForSale from './components/DomainForSale'
-// Weather panel removed as requested
-import HighAlertFeed from './components/HighAlertFeed'
+// Weather panel and HighAlertFeed removed as requested
 import WindyWebcamView from './components/WindyWebcamView'
 
 // Error Boundary Component to catch rendering errors
@@ -123,8 +122,6 @@ function App() {
             <DoomsdayClock />
             
             <DomainForSale />
-            
-            <HighAlertFeed />
             
             <div className="w-full">
               <LiveFeed />
