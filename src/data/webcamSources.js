@@ -111,3 +111,17 @@ export const windySources = webcamSources.reduce((acc, src) => {
   return acc;
 }, {});
 
+// Simplified version of webcam data for easier use in components
+export const CURATED_WEBCAMS = [
+  { id: 1693844957, city: "Moscow", label: "Khamovniki District (Near Kremlin)" },
+  { id: 1389696188, city: "Jerusalem", label: "City Center" },
+  { id: 1748254982, city: "Tel Aviv", label: "Hilton Beach" },
+  { id: 1744523397, city: "Jeokseong-myeon", label: "Near North Korea Border" },
+  { id: 1166267733, city: "Hong Kong", label: "Victoria Harbour" },
+  { id: 1596008082, city: "Beijing", label: "Olympic Tower" },
+  { id: 1263154384, city: "Washington D.C.", label: "US Capitol" },
+  { id: 1731400881, city: "Taipei", label: "Taipei 101" },
+  { id: 1568461321, city: "London", label: "City Center" },
+  { id: 1706118429, city: "Paris", label: "Palais d'Iéna" }
+];
+
