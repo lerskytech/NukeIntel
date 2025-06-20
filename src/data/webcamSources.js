@@ -1,93 +1,105 @@
+/**
+ * Webcam Sources for NukeIntel
+ * Direct links to webcam feeds from sites of global geopolitical interest
+ * Updated: 2025-06-20
+ *
+ * IMPLEMENTATION NOTE: All sources use the Windy Webcams API
+ * All Windy webcams use API key authentication via environment variables
+ * Tokens expire after 10 minutes, so data is refreshed automatically every 8 minutes
+ */
+
+// Visible webcam sources for user interface - using Windy Webcams API IDs
+// ONLY using the explicit list of 10 webcams provided by the user
 export const webcamSources = [
   {
-    id: '1360013045',
-    title: 'Brisas de Zicatela: Puerto Escondido',
+    id: '1693844957',
+    title: 'Moscow Khamovniki District',
     type: 'windy',
     refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'Puerto Escondido',
-    coordinates: '19.0500° N, 104.3167° W',
-    label: 'Puerto Escondido'
-  },
-  {
-    id: '1566394308',
-    title: 'El Penon › South-West',
-    type: 'windy',
-    refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'El Penon, Mexico',
-    coordinates: '19.4326° N, 99.1332° W',
-    label: 'El Penon'
-  },
-  {
-    id: '1748362473',
-    title: 'Ampliacion las Chiveras › West: Playa Larga',
-    type: 'windy',
-    refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'Playa Larga, Mexico',
-    coordinates: '20.6275° N, 87.0811° W',
-    label: 'Playa Larga'
-  },
-  {
-    id: '1639421838',
-    title: 'Tel Aviv-Yafo',
-    type: 'windy',
-    refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'Tel Aviv, Israel',
-    coordinates: '32.0853° N, 34.7818° E',
-    label: 'Tel Aviv'
+    location: 'Moscow, Russia',
+    coordinates: '55.7558° N, 37.6173° E',
+    label: 'Khamovniki District (Near Kremlin)'
   },
   {
     id: '1389696188',
-    title: 'Jerusalem',
+    title: 'Jerusalem City Center',
     type: 'windy',
     refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Jerusalem, Israel',
     coordinates: '31.7683° N, 35.2137° E',
-    label: 'Jerusalem'
+    label: 'City Center'
   },
   {
-    id: '1306621426',
-    title: 'Mexico City: Distrito Federal "Torre Latinoamericana" North',
+    id: '1748254982',
+    title: 'Tel Aviv Hilton Beach',
     type: 'windy',
     refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'Mexico City, Mexico',
-    coordinates: '19.4326° N, 99.1332° W',
-    label: 'Mexico City'
+    location: 'Tel Aviv, Israel',
+    coordinates: '32.0853° N, 34.7818° E',
+    label: 'Hilton Beach'
   },
   {
-    id: '1602018625',
-    title: 'Puerto Morelos: Casa Toucan',
+    id: '1744523397',
+    title: 'Near North Korea Border',
     type: 'windy',
     refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'Puerto Morelos, Mexico',
-    coordinates: '20.8500° N, 86.8750° W',
-    label: 'Puerto Morelos'
+    location: 'Jeokseong-myeon, South Korea',
+    coordinates: '38.1124° N, 127.0767° E',
+    label: 'Near North Korea Border'
   },
   {
-    id: '1662455177',
-    title: 'Kopra Village',
+    id: '1166267733',
+    title: 'Hong Kong Victoria Harbour',
     type: 'windy',
     refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'Kopra Village',
-    coordinates: '0.0000° N, 0.0000° E',
-    label: 'Kopra Village'
+    location: 'Hong Kong',
+    coordinates: '22.2783° N, 114.1747° E',
+    label: 'Victoria Harbour'
   },
   {
-    id: '1727873048',
-    title: 'Igrejinha: Rio Paranhana',
+    id: '1596008082',
+    title: 'Beijing Olympic Tower',
     type: 'windy',
     refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'Igrejinha, Brazil',
-    coordinates: '29.5756° S, 50.7911° W',
-    label: 'Igrejinha'
+    location: 'Beijing, China',
+    coordinates: '39.9042° N, 116.4074° E',
+    label: 'Olympic Tower'
   },
   {
-    id: '1662752804',
-    title: 'El Posquelite › South: Ajijic',
+    id: '1263154384',
+    title: 'Washington D.C. US Capitol',
     type: 'windy',
     refreshRate: 480000, // 8 minutes in milliseconds
-    location: 'Ajijic, Mexico',
-    coordinates: '20.2886° N, 103.2486° W',
-    label: 'Ajijic'
+    location: 'Washington D.C., USA',
+    coordinates: '38.8921° N, 77.0241° W',
+    label: 'US Capitol'
+  },
+  {
+    id: '1731400881',
+    title: 'Taipei 101',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
+    location: 'Taipei, Taiwan',
+    coordinates: '25.0330° N, 121.5654° E',
+    label: 'Taipei 101'
+  },
+  {
+    id: '1568461321',
+    title: 'London City Center',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
+    location: 'London, UK',
+    coordinates: '51.5074° N, 0.1278° W',
+    label: 'City Center'
+  },
+  {
+    id: '1706118429',
+    title: 'Paris Palais d\'Iéna',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
+    location: 'Paris, France',
+    coordinates: '48.8566° N, 2.3522° E',
+    label: 'Palais d\'Iéna'
   }
 ];
 
@@ -98,3 +110,4 @@ export const windySources = webcamSources.reduce((acc, src) => {
   }
   return acc;
 }, {});
+
