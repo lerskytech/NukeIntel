@@ -182,7 +182,7 @@ const NukeIntelBlog = () => {
                 <div className="text-white mb-2">{post.content}</div>
                 <div className="text-sm text-gray-400 flex items-center">
                   <FiUsers className="mr-1" />
-                  <span>{post.followers.toLocaleString()} followers</span>
+                  <span>{(post.followers || 0).toLocaleString()} followers</span>
                 </div>
               </motion.div>
             ))}
