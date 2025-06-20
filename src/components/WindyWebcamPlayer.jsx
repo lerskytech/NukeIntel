@@ -19,6 +19,18 @@ const WindyWebcamPlayer = ({ webcamId, label, city, highAlert = false, shareId }
   // Fetch webcam data from Windy API
   const { data: webcamData, isLoading, error } = useWindyWebcam(webcamId);
   
+  // Log any errors for debugging
+  useEffect(() => {
+    if (error) {
+      console.error(`Error loading webcam ${webcamId} (${city} - ${label}):`, error);
+      
+      // Specific error information
+      if (error.response) {
+        console.error(`Status: ${error.response.status}, Data:`, error.response.data);
+      }
+    }
+  }, [error, webcamId, city, label]);
+  
   // Handle share functionality
   const handleShareClick = () => {
     const shareUrl = `${window.location.origin}?webcam=${shareId}`;

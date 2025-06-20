@@ -19,7 +19,7 @@ import axios from 'axios';
  */
 export const useWindyWebcam = (webcamId) => {
   // API URL and key
-  const apiUrl = 'https://webcams.windy.com/webcams/api/v3/webcams';
+  const apiUrl = 'https://api.windy.com/webcams/api/v3/webcams';
   const apiKey = import.meta.env.VITE_WINDY_API_KEY;
 
   const fetchWebcamData = async () => {
@@ -31,7 +31,16 @@ export const useWindyWebcam = (webcamId) => {
       
       if (!apiKey) {
         console.error('Windy API key not found in environment variables');
+        console.error('Make sure VITE_WINDY_API_KEY is set in your .env file');
         throw new Error('API key not configured');
+      }
+      
+      // Debug log the webcam ID we're fetching
+      console.log(`Fetching webcam data for ID: ${webcamId}`);
+      
+      // Check if API key has proper format (without revealing the actual key)
+      if (apiKey && apiKey.length < 10) {
+        console.warn('Windy API key appears too short, might be invalid');
       }
 
       // Make API request
@@ -85,7 +94,7 @@ export const useWindyWebcam = (webcamId) => {
  */
 export const useMultipleWindyWebcams = (webcamIds = []) => {
   // API URL and key
-  const apiUrl = 'https://webcams.windy.com/webcams/api/v3/webcams';
+  const apiUrl = 'https://api.windy.com/webcams/api/v3/webcams';
   const apiKey = import.meta.env.VITE_WINDY_API_KEY;
 
   const fetchMultipleWebcams = async () => {
@@ -97,7 +106,16 @@ export const useMultipleWindyWebcams = (webcamIds = []) => {
       
       if (!apiKey) {
         console.error('Windy API key not found in environment variables');
+        console.error('Make sure VITE_WINDY_API_KEY is set in your .env file');
         throw new Error('API key not configured');
+      }
+      
+      // Debug log the webcam IDs we're fetching
+      console.log(`Fetching ${webcamIds.length} webcams with IDs: ${webcamIds.join(', ')}`);
+      
+      // Check if API key has proper format (without revealing the actual key)
+      if (apiKey && apiKey.length < 10) {
+        console.warn('Windy API key appears too short, might be invalid');
       }
 
       // Join webcam IDs with commas for the API request
