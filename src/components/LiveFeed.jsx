@@ -94,8 +94,9 @@ export default function LiveFeed() {
         transition={{ duration: 0.5 }}
       >
         <LiveStream 
-          src={activeSource.src}
+          webcamId={activeSource.id}
           title={activeSource.title}
+          location={activeSource.location}
         />
       </motion.div>
 

@@ -15,11 +15,10 @@ const Footer = () => {
       >
         <div className="text-center md:text-left">
           <motion.div 
-            className="text-sm text-gray-400 flex items-center gap-1"
-            whileHover={{ color: '#90cdf4' }}
+            className="text-sm text-white bg-red-900/30 px-3 py-1 rounded-full flex items-center gap-1"
+            whileHover={{ backgroundColor: 'rgba(185, 28, 28, 0.4)' }}
           >
-            <span>Powered by</span>
-            <span className="font-semibold text-neon-blue">OpenAI GPT</span>
+            <span className="font-semibold">NukeIntel.com Domain For Sale</span>
           </motion.div>
         </div>
         
@@ -53,17 +52,20 @@ const Footer = () => {
         </div>
         
         <motion.div 
-          className="text-sm text-gray-600"
+          className="text-sm text-gray-400"
           whileHover={{ color: '#a0aec0' }}
           transition={{ duration: 0.2 }}
         >
-          &copy; {currentYear} Doomsday Clock Tracker
+          &copy; {currentYear} NukeIntel.com • Premium Domain For Sale
         </motion.div>
       </motion.div>
       
-      <div className="text-center mt-6 text-xs text-gray-600 max-w-2xl mx-auto">
-        <p>
+      <div className="text-center mt-6 text-xs text-gray-500 max-w-2xl mx-auto">
+        <p className="mb-2">
           The Doomsday Clock is a symbol that represents the likelihood of a human-made global catastrophe, maintained by the Bulletin of the Atomic Scientists. This is an unofficial tracker.
+        </p>
+        <p className="text-red-400">
+          <strong>NukeIntel.com</strong> is a premium domain currently available for purchase. Contact via the inquiry form above.
         </p>
       </div>
     </footer>

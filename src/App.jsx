@@ -7,7 +7,9 @@ import LiveFeed from './components/LiveFeed'
 import NewsWidget from './components/NewsWidget'
 import Footer from './components/Footer'
 import DomainForSale from './components/DomainForSale'
-import WeatherPanel from './components/WeatherPanel'
+// Weather panel removed as requested
+import HighAlertFeed from './components/HighAlertFeed'
+import WindyWebcamView from './components/WindyWebcamView'
 
 // Error Boundary Component to catch rendering errors
 class ErrorBoundary extends Component {
@@ -51,11 +53,31 @@ class ErrorBoundary extends Component {
 function App() {
   // Track if page has been loaded (for animations)
   const [pageLoaded, setPageLoaded] = useState(false)
+  // Track if we're viewing a shared webcam
+  const [sharedWebcamId, setSharedWebcamId] = useState(null)
   
   useEffect(() => {
     // Trigger animations after initial load
     setPageLoaded(true)
+    
+    // Check URL for webcam sharing parameters
+    const urlParams = new URLSearchParams(window.location.search)
+    const webcamId = urlParams.get('webcam')
+    if (webcamId) {
+      setSharedWebcamId(webcamId)
+      // Update document title for shared webcam
+      document.title = 'NukeIntel - Shared Webcam'
+    }
   }, [])
+  
+  // Handle closing the shared webcam view
+  const handleBackFromWebcam = () => {
+    setSharedWebcamId(null)
+    // Clear URL parameters
+    window.history.pushState({}, '', '/')
+    // Reset document title
+    document.title = 'NukeIntel - Real-Time Global Threat Tracker'
+  }
 
   return (
       <div className="min-h-screen flex flex-col bg-gray-900 text-white relative overflow-hidden" style={{backgroundColor: '#0a0a0a'}}>
@@ -80,23 +102,38 @@ function App() {
 
         <Header />
         
-        <motion.main 
-          className="flex-grow flex flex-col items-center justify-start px-4 py-8 gap-8 max-w-5xl mx-auto w-full z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: pageLoaded ? 1 : 0 }}
-          transition={{ duration: 0.5, staggerChildren: 0.2 }}
-        >
-          <DoomsdayClock />
-          
-          <DomainForSale />
-          
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <LiveFeed />
-            <WeatherPanel />
-          </div>
-          
-          <NewsWidget />
-        </motion.main>
+        {sharedWebcamId ? (
+          // Display shared webcam view when webcam parameter is present
+          <motion.main 
+            className="flex-grow px-4 py-8 max-w-5xl mx-auto w-full z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: pageLoaded ? 1 : 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <WindyWebcamView shareId={sharedWebcamId} onBack={handleBackFromWebcam} />
+          </motion.main>
+        ) : (
+          // Display normal app content
+          <motion.main 
+            className="flex-grow flex flex-col items-center justify-start px-4 py-8 gap-8 max-w-5xl mx-auto w-full z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: pageLoaded ? 1 : 0 }}
+            transition={{ duration: 0.5, staggerChildren: 0.2 }}
+          >
+            <DoomsdayClock />
+            
+            <DomainForSale />
+            
+            <HighAlertFeed />
+            
+            <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <LiveFeed />
+              {/* Weather panel removed as requested */}
+            </div>
+            
+            <NewsWidget />
+          </motion.main>
+        )}
         
         <Footer />
       </div>

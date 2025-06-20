@@ -3,125 +3,123 @@
  * Direct links to webcam feeds from sites of global geopolitical interest
  * Updated: 2025-06-19
  *
- * IMPLEMENTATION NOTE: All sources are reliable, embeddable live feeds using iframe format
- * All sources have been verified as active 24/7 livestreams
+ * IMPLEMENTATION NOTE: All sources use the Windy Webcams API
+ * All Windy webcams use API key authentication via environment variables
+ * Tokens expire after 10 minutes, so data is refreshed automatically every 8 minutes
  */
 
-// Visible webcam sources for user interface
+// Visible webcam sources for user interface - using Windy Webcams API IDs
 export const webcamSources = [
   {
-    id: 'tel-aviv',
+    id: '1538348110',  // Windy webcam ID for Tel Aviv 
     title: 'Tel Aviv Beach',
-    src: 'https://www.youtube.com/embed/VQnH2cATIwY?autoplay=1&mute=1', 
-    type: 'youtube',
-    refreshRate: 0, // Not used for YouTube embeds
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Tel Aviv, Israel',
     coordinates: '32.0853° N, 34.7818° E'
   },
   {
-    id: 'tehran',
+    id: '1479594949',  // Windy webcam ID for Tehran
     title: 'Tehran City View',
-    src: 'https://www.youtube.com/embed/n4Ai-3YIKZU?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Tehran, Iran',
     coordinates: '35.6892° N, 51.3890° E'
   },
   {
-    id: 'kyiv',
-    title: 'Kyiv Independence Square',
-    src: 'https://www.youtube.com/embed/HCMJPl6Mj0I?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
+    id: '1501891517',  // Windy webcam ID for Kyiv
+    title: 'Kyiv Maidan Square',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Kyiv, Ukraine',
     coordinates: '50.4501° N, 30.5234° E'
   },
   {
-    id: 'moscow',
-    title: 'Moscow Red Square',
-    src: 'https://www.youtube.com/embed/0fCQd9GJDhw?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
+    id: '1250865925',  // Windy webcam ID for Moscow
+    title: 'Moscow City View',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Moscow, Russia',
     coordinates: '55.7558° N, 37.6173° E'
   },
   {
-    id: 'washington-dc',
-    title: 'Washington Monument',
-    src: 'https://www.youtube.com/embed/83VPsAPWiME?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
+    id: '1236943260',  // Windy webcam ID for Washington DC
+    title: 'Washington DC Capitol',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Washington DC, USA',
-    coordinates: '38.9072° N, 77.0369° W'
+    coordinates: '38.8921° N, 77.0241° W'
   },
   {
-    id: 'beijing',
-    title: 'Beijing City Center',
-    src: 'https://www.youtube.com/embed/0FnDgu8QRH4?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
-    location: 'Beijing, China',
-    coordinates: '39.9042° N, 116.4074° E'
+    id: '1266166264',  // Windy webcam ID for Tokyo
+    title: 'Tokyo Shibuya Crossing',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
+    location: 'Tokyo, Japan',
+    coordinates: '35.6762° N, 139.6503° E'
   },
   {
-    id: 'seoul',
-    title: 'Seoul City View',
-    src: 'https://www.youtube.com/embed/AbiBqvh-lOo?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
+    id: '1517595746',  // Windy webcam ID for Seoul
+    title: 'Seoul Live',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Seoul, South Korea',
     coordinates: '37.5665° N, 126.9780° E'
   },
   {
-    id: 'taipei',
+    id: '1260641782',  // Windy webcam ID for Taipei
     title: 'Taipei 101 Tower',
-    src: 'https://www.youtube.com/embed/VvBYhpAZZ_E?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Taipei, Taiwan',
     coordinates: '25.0330° N, 121.5654° E'
   },
   {
-    id: 'gaza-city',
-    title: 'Gaza Shoreline',
-    src: 'https://www.youtube.com/embed/PQxters5Cfk?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
-    location: 'Gaza City, Gaza Strip',
-    coordinates: '31.5017° N, 34.4668° E'
+    id: '1341439400',  // Windy webcam ID for New York
+    title: 'New York Times Square',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
+    location: 'New York City, USA',
+    coordinates: '40.7580° N, 73.9855° W'
   },
   {
-    id: 'london',
-    title: 'London Tower Bridge',
-    src: 'https://www.youtube.com/embed/26FLDP9PR8M?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
-    location: 'London, United Kingdom',
+    id: '1173901066',  // Windy webcam ID for London
+    title: 'London Westminster',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
+    location: 'London, UK',
     coordinates: '51.5074° N, 0.1278° W'
   },
   {
-    id: 'pyongyang',
-    title: 'Pyongyang City Center',
-    src: 'https://www.youtube.com/embed/YZ20IqAkrSs?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
-    location: 'Pyongyang, North Korea',
+    id: '1478938274',  // Windy webcam ID for a location near NK border
+    title: 'North Korea Border',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
+    location: 'North Korea Border',
     coordinates: '39.0392° N, 125.7625° E'
   },
   {
-    id: 'venice-italy',
-    title: 'Venice Grand Canal', 
-    src: 'https://www.youtube.com/embed/ph1vpnYIxJk?autoplay=1&mute=1',
-    type: 'youtube',
-    refreshRate: 0,
+    id: '1224129419',  // Windy webcam ID for Berlin
+    title: 'Berlin Brandenburg Gate',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
+    location: 'Berlin, Germany',
+    coordinates: '52.5200° N, 13.4050° E'
+  },
+  {
+    id: '1200564526',  // Windy webcam ID for Venice Grand Canal
+    title: 'Venice Grand Canal',
+    type: 'windy',
+    refreshRate: 480000, // 8 minutes in milliseconds
     location: 'Venice, Italy',
-    coordinates: '45.4408° N, 12.3155° E',
-    isReference: true // Flag to hide from UI but keep for reference
+    coordinates: '45.4408° N, 12.3155° E'
   }
 ];
 
 // Lookup object for easier access to sources
-export const youtubeSources = webcamSources.reduce((acc, src) => {
-  acc[src.id] = src.src;
+export const windySources = webcamSources.reduce((acc, src) => {
+  if (src.type === 'windy') {
+    acc[src.id] = src;
+  }
   return acc;
 }, {});

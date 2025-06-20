@@ -1,47 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
+import WindyWebcamPlayer from './WindyWebcamPlayer';
 import { FiAlertTriangle, FiLoader, FiFlag } from 'react-icons/fi';
 
 /**
  * LiveStream Component
- * Renders a YouTube embed with clean loading and error states
+ * Renders a Windy webcam feed with clean loading and error states
  * 
  * @param {Object} props
- * @param {string} props.src - URL for YouTube embed
+ * @param {string} props.webcamId - ID of the Windy webcam to display
  * @param {string} props.title - Title of the webcam feed
+ * @param {string} props.location - Location of the webcam
  */
-export default function LiveStream({ src, title }) {
+export default function LiveStream({ webcamId, title, location }) {
+  // Split location into city and country if available
+  const locationParts = location ? location.split(',') : ['Unknown'];
+  const city = locationParts[0].trim();
+
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const iframeRef = useRef(null);
-  
-  useEffect(() => {
-    // Reset states when source changes
-    setIsLoading(true);
-    setHasError(false);
-    
-    // Add network status monitoring to retry when connection is restored
-    const handleOnline = () => {
-      if (hasError) {
-        console.log(`Network connection restored. Retrying: ${title}`);
-        setIsLoading(true);
-        setHasError(false);
-        // Reload the iframe by updating the src
-        if (iframeRef.current) {
-          const currentSrc = iframeRef.current.src;
-          iframeRef.current.src = "";
-          setTimeout(() => {
-            iframeRef.current.src = currentSrc;
-          }, 100);
-        }
-      }
-    };
-    
-    window.addEventListener('online', handleOnline);
-    
-    return () => {
-      window.removeEventListener('online', handleOnline);
-    };
-  }, [src, title, hasError]);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -52,9 +28,9 @@ export default function LiveStream({ src, title }) {
   const handleError = () => {
     setIsLoading(false);
     setHasError(true);
-    console.log(`Error loading feed: ${src}`);
+    console.log(`Error loading feed: ${webcamId}`);
   };
-  
+
   const reportBrokenFeed = () => {
     // This would typically send a notification to admins
     console.log(`User reported broken feed: ${title}`);
@@ -64,15 +40,12 @@ export default function LiveStream({ src, title }) {
   return (
     <div className="w-full max-w-2xl mx-auto bg-black rounded-lg shadow-2xl my-4 overflow-hidden">
       <div className="relative aspect-video">
-        {/* YouTube iframe */}
-        <iframe
-          ref={iframeRef}
-          className="w-full h-full absolute inset-0"
-          src={src}
-          title={`${title} live stream`}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
+        <WindyWebcamPlayer
+          webcamId={webcamId}
+          city={city}
+          label={title}
+          highAlert={false}
+          shareId={webcamId}
           onLoad={handleLoad}
           onError={handleError}
         />

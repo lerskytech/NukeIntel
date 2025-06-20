@@ -1,7 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { FiClock, FiAlertTriangle } from 'react-icons/fi'
-import UserProfile from './UserProfile'
 
 const Header = () => {
   return (
@@ -52,9 +51,11 @@ const Header = () => {
         </motion.div>
         </div>
         
-        {/* User Profile component */}
+        {/* Domain Name Badge */}
         <div className="md:absolute md:right-6 md:top-6">
-          <UserProfile />
+          <div className="px-4 py-2 bg-red-900/30 rounded-full flex items-center">
+            <span className="text-red-400 font-bold">Domain For Sale</span>
+          </div>
         </div>
       </div>
     </motion.header>
