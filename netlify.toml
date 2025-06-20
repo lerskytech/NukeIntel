@@ -7,7 +7,7 @@
   NODE_VERSION = "18.19.1"
   NPM_FLAGS = "--legacy-peer-deps"
   NPM_VERSION = "10.2.3"
-  ESBUILD_BINARY_PATH = "./node_modules/esbuild/bin/esbuild"
+  # Remove explicit esbuild path to allow npm to handle it properly
 
 [[redirects]]
   from = "/*"

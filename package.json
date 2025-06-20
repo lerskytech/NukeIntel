@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build --mode production",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "postinstall": "node -e \"try { require('fs').unlinkSync('./node_modules/.bin/esbuild') } catch(e){}\""
+    "preview": "vite preview"
   },
   "engines": {
     "node": "18.19.1",
@@ -32,6 +31,7 @@
     "@types/react-helmet": "^6.1.9",
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.14",
+    "esbuild": "^0.25.5",
     "eslint": "^8.45.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
