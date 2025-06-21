@@ -60,7 +60,8 @@ function BulletproofWindyWebcams() {
       background: "#11141A",
       padding: 32,
       borderRadius: 24,
-      maxWidth: 500,
+      width: "100%",
+      maxWidth: 800,
       margin: "40px auto",
       boxShadow: "0 0 40px #121",
       fontFamily: "system-ui, sans-serif"
@@ -92,7 +93,7 @@ function BulletproofWindyWebcams() {
         background: "#181F29",
         borderRadius: 16,
         padding: 16,
-        minHeight: 350,
+        minHeight: 450,
         position: "relative",
         overflow: "hidden"
       }}>
@@ -129,17 +130,18 @@ function WebcamFeed({ data }) {
         <div>Embed URL: {String(embedUrl)}</div>
       </div>
       <div style={{
-        position: "relative", width: "100%", aspectRatio: "16/9", background: "#000", borderRadius: 8, overflow: "hidden"
+        position: "relative", width: "100%", aspectRatio: "16/9", background: "#000", borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
       }}>
         {playing && embedUrl ? (
           <iframe
-            src={embedUrl}
+            src={embedUrl + '?autoplay=1&muted=0'}
             title={data.title}
             width="100%"
-            height="300"
-            style={{ border: "none", width: "100%", height: 300, borderRadius: 8 }}
+            height="400"
+            style={{ border: "none", width: "100%", height: 400, borderRadius: 8 }}
             allow="autoplay; fullscreen"
             allowFullScreen
+            frameBorder="0"
           />
         ) : (
           <div
@@ -153,7 +155,7 @@ function WebcamFeed({ data }) {
             <img
               src={preview || thumbnail}
               alt={data.title}
-              style={{ width: "100%", height: 300, objectFit: "cover", borderRadius: 8, opacity: 0.85 }}
+              style={{ width: "100%", height: 400, objectFit: "cover", borderRadius: 8, opacity: 0.85 }}
             />
             <div style={{
               position: "absolute", top: "50%", left: "50%",
