@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet'
 import { motion } from 'framer-motion'
 import Header from './components/Header'
 import DoomsdayClock from './components/DoomsdayClock'
-import LiveFeed from './components/LiveFeed'
+// LiveFeed removed as requested
 import NewsWidget from './components/NewsWidget'
 import Footer from './components/Footer'
 import DomainForSale from './components/DomainForSale'
@@ -124,9 +124,7 @@ function App() {
             
             <DomainForSale />
             
-            <div className="w-full">
-              <LiveFeed />
-            </div>
+            {/* LiveFeed component removed as requested */}
             
             <NewsWidget />
             
