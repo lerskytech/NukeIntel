@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet'
 import { motion } from 'framer-motion'
 import Header from './components/Header'
 import DoomsdayClock from './components/DoomsdayClock'
-// LiveFeed removed as requested
+import LiveFeed from './components/LiveFeed'
 import NewsWidget from './components/NewsWidget'
 import Footer from './components/Footer'
 import DomainForSale from './components/DomainForSale'
@@ -124,13 +124,14 @@ function App() {
             
             <DomainForSale />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-              <div className="md:col-span-1">
-                <NewsWidget />
-              </div>
-              <div className="md:col-span-1">
-                <BulletproofWindyWebcams />
-              </div>
+            <div className="w-full">
+              <LiveFeed />
+            </div>
+            
+            <NewsWidget />
+            
+            <div className="w-full">
+              <BulletproofWindyWebcams />
             </div>
           </motion.main>
         )}

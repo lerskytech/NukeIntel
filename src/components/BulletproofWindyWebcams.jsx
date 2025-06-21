@@ -60,40 +60,13 @@ function BulletproofWindyWebcams() {
       background: "#11141A",
       padding: 32,
       borderRadius: 24,
-      width: "100%",
-      height: "100%",
-      boxShadow: "0 0 40px rgba(0, 128, 255, 0.2)",
-      fontFamily: "system-ui, sans-serif",
-      border: "1px solid rgba(0, 128, 255, 0.2)"
+      maxWidth: 500,
+      margin: "40px auto",
+      boxShadow: "0 0 40px #121",
+      fontFamily: "system-ui, sans-serif"
     }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <h2 style={{ color: "#fff", fontWeight: 700, margin: 0 }}>
-          <span style={{ color: "#4d88ff" }}>◉ </span>
-          NukeIntel High-Alert Webcams
-        </h2>
-        <div style={{ 
-          backgroundColor: "#d32f2f", 
-          fontSize: 12, 
-          fontWeight: 600,
-          padding: "3px 8px",
-          borderRadius: 12,
-          color: "white",
-          textTransform: "uppercase",
-          letterSpacing: "0.5px"
-        }}>
-          LIVE
-        </div>
-      </div>
-      <div style={{ 
-        display: "flex", 
-        gap: 6, 
-        flexWrap: "wrap", 
-        marginBottom: 16,
-        backgroundColor: "rgba(0, 0, 0, 0.3)",
-        padding: 8,
-        borderRadius: 12,
-        overflowX: "auto"
-      }}>
+      <h2 style={{ color: "#fff", marginBottom: 8, fontWeight: 700 }}>NukeIntel High-Alert Webcams</h2>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
         {WEBCAMS.map((cam, idx) => (
           <button
             key={cam.id}
@@ -103,17 +76,11 @@ function BulletproofWindyWebcams() {
               borderRadius: 8,
               border: "none",
               fontWeight: 600,
-              background: idx === current 
-                ? "linear-gradient(135deg, #d32f2f, #b71c1c)" 
-                : "linear-gradient(135deg, #333, #222)",
+              background: idx === current ? "#d32f2f" : "#333",
               color: "#fff",
               cursor: "pointer",
-              boxShadow: idx === current ? "0 2px 12px #d32f2f88" : "0 1px 3px rgba(0,0,0,0.3)",
+              boxShadow: idx === current ? "0 2px 12px #d32f2f88" : undefined,
               opacity: feedError && idx === current ? 0.5 : 1,
-              fontSize: "0.8rem",
-              minWidth: "60px",
-              textAlign: "center",
-              transition: "all 0.2s ease"
             }}
           >
             {cam.label.split("–")[0].trim()}
@@ -125,74 +92,24 @@ function BulletproofWindyWebcams() {
         background: "#181F29",
         borderRadius: 16,
         padding: 16,
-        minHeight: 380,
+        minHeight: 350,
         position: "relative",
-        overflow: "hidden",
-        border: "1px solid rgba(255,255,255,0.05)"
+        overflow: "hidden"
       }}>
         {loading ? (
-          <div style={{ 
-            color: "#ccc", 
-            textAlign: "center", 
-            padding: 40, 
-            display: "flex", 
-            flexDirection: "column",
-            alignItems: "center", 
-            justifyContent: "center",
-            height: 300
-          }}>
-            <div style={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              border: "3px solid rgba(0,0,0,0)",
-              borderTopColor: "#4d88ff",
-              animation: "spin 1s linear infinite",
-              marginBottom: 16
-            }}></div>
+          <div style={{ color: "#ccc", textAlign: "center", padding: 40 }}>
             Loading live feed...
-            <style dangerouslySetInnerHTML={{ __html: `
-              @keyframes spin {
-                to { transform: rotate(360deg); }
-              }
-            `}} />
           </div>
         ) : feedError ? (
           <div style={{
-            color: "#d32f2f", 
-            textAlign: "center", 
-            padding: 40,
-            fontWeight: 600, 
-            fontSize: 20,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: 300
+            color: "#d32f2f", textAlign: "center", padding: 40,
+            fontWeight: 600, fontSize: 20
           }}>
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            <div style={{ marginTop: 16 }}>Feed unavailable</div>
-            <div style={{ fontSize: 14, color: "#999", fontWeight: "normal", marginTop: 8 }}>Please try another webcam</div>
+            Feed unavailable
           </div>
         ) : data ? (
           <WebcamFeed data={data} />
         ) : null}
-      </div>
-      
-      <div style={{ 
-        marginTop: 16, 
-        fontSize: 11, 
-        color: "#666", 
-        textAlign: "center", 
-        padding: "8px 16px",
-        borderRadius: 8,
-        background: "rgba(0,0,0,0.2)"
-      }}>
-        All webcams are provided by <a href="https://www.windy.com" target="_blank" rel="noopener noreferrer" style={{ color: "#4d88ff", textDecoration: "none" }}>Windy.com</a> | Updated: {new Date().toLocaleString()}
       </div>
     </div>
   );
