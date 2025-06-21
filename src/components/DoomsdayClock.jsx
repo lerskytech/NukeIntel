@@ -274,14 +274,14 @@ const DoomsdayClock = () => {
           ))}
         </div>
         
-        {/* Rolex-inspired NukeIntel brand icon */}
+        {/* Rolex-inspired NukeIntel brand icon at 12 o'clock position */}
         <motion.div
           style={{
             position: 'absolute',
-            width: '80px',
-            height: '80px',
-            transform: 'translate(-50%, -50%)',
-            top: '50%',
+            width: '50px',
+            height: '50px',
+            transform: 'translate(-50%, 0)',
+            top: '5%',
             left: '50%',
             display: 'flex',
             alignItems: 'center',
@@ -289,10 +289,9 @@ const DoomsdayClock = () => {
             zIndex: 20
           }}
           animate={{
-            rotate: [0, 360],
-            scale: pulseEffect ? [1, 1.1, 1] : 1,
+            scale: pulseEffect ? [1, 1.05, 1] : 1,
           }}
-          transition={{ rotate: { duration: 20, ease: 'linear', repeat: Infinity }, scale: { duration: 3, repeat: Infinity } }}
+          transition={{ scale: { duration: 3, repeat: Infinity } }}
         >
           <img 
             src={nuclearCrownIcon} 
