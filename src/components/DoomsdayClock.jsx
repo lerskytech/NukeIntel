@@ -3,7 +3,6 @@ import ClockModal from './ClockModal'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useClockData } from '../hooks/useClockData'
 import { FiAlertTriangle } from 'react-icons/fi'
-import nuclearCrownIcon from '../assets/images/nuclear-crown.svg'
 
 const DoomsdayClock = () => {
   const [showModal, setShowModal] = useState(false)
@@ -274,31 +273,7 @@ const DoomsdayClock = () => {
           ))}
         </div>
         
-        {/* Rolex-inspired NukeIntel brand icon at 12 o'clock position */}
-        <motion.div
-          style={{
-            position: 'absolute',
-            width: '50px',
-            height: '50px',
-            transform: 'translate(-50%, 0)',
-            top: '5%',
-            left: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 20
-          }}
-          animate={{
-            scale: pulseEffect ? [1, 1.05, 1] : 1,
-          }}
-          transition={{ scale: { duration: 3, repeat: Infinity } }}
-        >
-          <img 
-            src={nuclearCrownIcon} 
-            alt="NukeIntel golden crown emblem" 
-            style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
-          />
-        </motion.div>
+
         
         {/* Hour hand - styled for a professional look */}
         <motion.div
