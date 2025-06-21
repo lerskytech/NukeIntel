@@ -122,15 +122,15 @@ function App() {
           >
             <DoomsdayClock />
             
-            <DomainForSale />
+            <div className="w-full">
+              <BulletproofWindyWebcams />
+            </div>
             
             {/* LiveFeed component removed as requested */}
             
             <NewsWidget />
             
-            <div className="w-full">
-              <BulletproofWindyWebcams />
-            </div>
+            <DomainForSale />
           </motion.main>
         )}
         
