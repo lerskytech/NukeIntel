@@ -121,18 +121,7 @@ const DoomsdayClock = () => {
         {/* Clock face */}
         <div className="absolute inset-2 rounded-full bg-black z-10"/>
         
-        {/* Red danger zone - at top of clock (midnight) */}
-        <motion.div 
-          className="absolute w-[16%] h-[12%] z-20"
-          style={{ 
-            background: 'radial-gradient(circle, rgba(255,30,30,0.8) 0%, rgba(255,0,0,0) 80%)',
-            top: '5%',
-            left: '42%',
-            boxShadow: '0 0 10px rgba(255,0,0,0.2)',
-          }}
-          animate={{ opacity: pulseEffect ? [0.6, 0.8, 0.6] : [0.4, 0.6, 0.4] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        />
+        {/* Removed red danger zone that was causing blur effect */}
         
         {/* Clock hour markers - much bolder and more professional */}
         {[...Array(12)].map((_, index) => {
