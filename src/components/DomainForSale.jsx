@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiMail, FiDollarSign, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiMail, FiDollarSign, FiCheck, FiAlertCircle, FiShoppingCart, FiArrowRight } from 'react-icons/fi';
 
 export default function DomainForSale() {
   const [email, setEmail] = useState('');
@@ -83,6 +83,35 @@ export default function DomainForSale() {
           Perfect for intelligence agencies, global risk assessment services, 
           or media organizations focused on geopolitical threats.
         </p>
+        
+        {/* GoDaddy Checkout Button */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <a 
+            href="https://checkoutlink.godaddy.com/3d0b7d97-71b1-4cc8-9497-d781b68cc52e"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-bold rounded-lg text-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+          >
+            <FiShoppingCart className="mr-3 h-6 w-6" />
+            Buy This Domain Now
+            <FiArrowRight className="ml-3 h-5 w-5" />
+          </a>
+          <p className="mt-3 text-gray-400 text-sm">Secure checkout via GoDaddy</p>
+        </motion.div>
+        
+        <div className="relative my-8">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-700"></div>
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-gradient-to-br from-gray-900 to-black px-4 text-sm text-gray-400">Or Submit Inquiry</span>
+          </div>
+        </div>
 
         {!submitted ? (
           <form onSubmit={handleSubmit} className="mt-6 text-left">
@@ -125,7 +154,7 @@ export default function DomainForSale() {
               type="submit"
               disabled={loading}
               className={`w-full p-4 rounded-lg font-bold flex items-center justify-center transition-all ${
-                loading ? 'bg-gray-700 text-gray-500' : 'bg-red-600 hover:bg-red-700 text-white'
+                loading ? 'bg-gray-700 text-gray-500' : 'bg-gray-600 hover:bg-gray-700 text-white'
               }`}
             >
               {loading ? (

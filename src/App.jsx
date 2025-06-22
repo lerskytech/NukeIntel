@@ -82,10 +82,26 @@ function App() {
   return (
       <div className="min-h-screen flex flex-col bg-gray-900 text-white relative overflow-hidden" style={{backgroundColor: '#0a0a0a'}}>
         <Helmet>
-          <title>NukeIntel - Real-Time Global Threat Tracker</title>
-          <meta name="description" content="Track global nuclear threats in real-time and monitor risks including weapons proliferation, climate change, and disruptive technologies." />
-          <meta property="og:title" content="NukeIntel - Real-Time Global Threat Tracker" />
-          <meta property="og:description" content="Live updates on how close we are to global catastrophe, according to the Bulletin of Atomic Scientists." />
+          <title>Israel-Iran Nuclear Conflict | US Military Response | NukeIntel</title>
+          <meta name="description" content="Live updates on the US-Israel-Iran nuclear conflict. Real-time doomsday clock and risk assessment for the ongoing military escalation in the Middle East." />
+          <meta name="keywords" content="Israel Iran nuclear conflict, US bombs Iran, Middle East war, nuclear tensions, Israel Iran war, doomsday clock, nuclear threat assessment, US military response, Middle East nuclear crisis, nuclear escalation, Iran nuclear facilities, Israel defense, global nuclear risk" />
+          
+          {/* OpenGraph Tags */}
+          <meta property="og:title" content="Israel-Iran Nuclear Conflict | US Military Response | NukeIntel" />
+          <meta property="og:description" content="Live updates on the US-Israel-Iran nuclear conflict. Real-time doomsday clock and risk assessment for the ongoing military escalation in the Middle East." />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://nukeintel.com/" />
+          <meta property="og:site_name" content="NukeIntel | Global Risk Monitor" />
+          
+          {/* Twitter Card Tags */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content="Israel-Iran Nuclear Conflict | US Military Response | NukeIntel" />
+          <meta name="twitter:description" content="Live updates on the US-Israel-Iran nuclear conflict. Real-time doomsday clock and risk assessment for the ongoing military escalation in the Middle East." />
+          
+          {/* Additional SEO Tags */}
+          <meta name="news:keywords" content="Israel-Iran conflict, US bombs Iran, nuclear war risk, Middle East crisis" />
+          <meta name="robots" content="index, follow" />
+          <meta http-equiv="content-language" content="en-us" />
           <meta name="theme-color" content="#0a0a0a" />
         </Helmet>
         
